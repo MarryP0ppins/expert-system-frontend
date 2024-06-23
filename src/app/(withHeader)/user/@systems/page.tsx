@@ -1,5 +1,5 @@
 'use client';
-import React, { memo, useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
@@ -34,7 +34,7 @@ export const Page: React.FC = () => {
     queryKey: [SYSTEMS.GET_USER, { user_id: user?.id, all_types: true }],
     queryFn: async () => await getSystems({ user_id: user?.id, all_types: true }),
   });
-  console.log(systemFile);
+
   const addMutate = useMutation({
     mutationFn: importSystem,
     onSuccess: (newSystem) => {
@@ -139,4 +139,4 @@ export const Page: React.FC = () => {
   );
 };
 
-export default dynamic(() => Promise.resolve(memo(Page)), { ssr: false, loading: () => <Loader sizepx={116} /> });
+export default dynamic(() => Promise.resolve(Page), { ssr: false, loading: () => <Loader sizepx={116} /> });
