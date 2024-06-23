@@ -130,7 +130,7 @@ const RuleField: React.FC<RuleFieldProps> = ({
     },
     [questionRemove, questionUpdate],
   );
-  //useEffect(() => console.log(attributeRule), [attributeRule]);
+
   if (!isVisible) {
     return null;
   }

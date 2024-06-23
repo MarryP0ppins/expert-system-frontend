@@ -56,11 +56,13 @@ const Layout: React.FC<SystemEditorPageLayoutProps> = ({ system, attributes, obj
   const router = useRouter();
   const user = useUserStore((store) => store.user);
   const { setAttributes, setQuestions } = useRulePageStore((store) => store);
-  const system_id = useMemo(() => systemIdValidation.safeParse(params).data?.system_id ?? -1, [params]);
+  const system_id = useMemo(() => systemIdValidation.safeParse(params).data?.system_id, [params]);
+  const searchParams = useSearchParams();
+  const [section, setSection] = useState<Section>(getSection(searchParams.get('section')));
   const queryClient = useQueryClient();
   const { data: systemData, status } = useQuery({
-    queryKey: [SYSTEMS.RETRIEVE, { user_id: user?.id, system_id }],
-    queryFn: async () => await getSystemOne(system_id),
+    queryKey: [SYSTEMS.RETRIEVE, { user: user?.id, system: system_id }],
+    queryFn: async () => await getSystemOne(system_id ?? -1),
     initialData: () =>
       queryClient
         .getQueryData<TSystemsWithPage>([SYSTEMS.GET_USER, { user_id: user?.id, all_types: true }])
@@ -76,24 +78,31 @@ const Layout: React.FC<SystemEditorPageLayoutProps> = ({ system, attributes, obj
   const [attributeQueryResult, questionsQueryResult] = useQueries({
     queries: [
       {
-        queryKey: [ATTRIBUTES.GET, { user: user?.id, system: systemData?.id ?? -1 }],
-        queryFn: async () => getAttributesWithValues(systemData?.id ?? -1),
-        enabled: !!systemData,
+        queryKey: [ATTRIBUTES.GET, { user: user?.id, system: system_id }],
+        queryFn: async () => {
+          const res = await getAttributesWithValues(system_id ?? -1);
+          console.log('log layout');
+          return res;
+        },
+        enabled: !!systemData?.id && ![Section.ATTRIBUTES, Section.RULES].includes(section),
       },
       {
-        queryKey: [QUESTIONS.GET, { user: user?.id, system: systemData?.id ?? -1 }],
-        queryFn: async () => getQuestionsWithAnswers(systemData?.id ?? -1),
-        enabled: !!systemData,
+        queryKey: [QUESTIONS.GET, { user: user?.id, system: system_id }],
+        queryFn: async () => getQuestionsWithAnswers(system_id ?? -1),
+        enabled: !!systemData?.id && ![Section.QUESTIONS, Section.RULES].includes(section),
       },
       {
-        queryKey: [RULES.GET, { user: user?.id, system: systemData?.id ?? -1 }],
-        queryFn: async () => getRulesWithClausesAndEffects(systemData?.id ?? -1),
-        enabled: !!systemData,
+        queryKey: [RULES.GET, { user: user?.id, system: system_id }],
+        queryFn: async () => getRulesWithClausesAndEffects(system_id ?? -1),
+        enabled: !!systemData?.id && section !== Section.RULES,
       },
       {
-        queryKey: [OBJECTS.GET, { user: user?.id, system: systemData?.id ?? -1 }],
-        queryFn: async () => getObjectsWithAttrValues(systemData?.id ?? -1),
-        enabled: !!systemData,
+        queryKey: [OBJECTS.GET, { user: user?.id, system: system_id }],
+        queryFn: async () => {
+          console.log('log layout object');
+          return getObjectsWithAttrValues(system_id ?? -1);
+        },
+        enabled: !!systemData?.id && section !== Section.OBJECTS,
       },
     ],
   });
@@ -107,7 +116,6 @@ const Layout: React.FC<SystemEditorPageLayoutProps> = ({ system, attributes, obj
     [attributeQueryResult, questionsQueryResult],
   );
   useEffect(() => {
-    console.log('rerender');
     if (memoQueryResult.attributesIsSuccess) {
       setAttributes(memoQueryResult.attributesData);
     }
@@ -115,9 +123,6 @@ const Layout: React.FC<SystemEditorPageLayoutProps> = ({ system, attributes, obj
       setQuestions(memoQueryResult.questionsData);
     }
   }, [memoQueryResult, setAttributes, setQuestions]);
-
-  const searchParams = useSearchParams();
-  const [section, setSection] = useState<Section>(getSection(searchParams.get('section')));
 
   useLayoutEffect(() => {
     if (section !== Section.SYSTEM) {

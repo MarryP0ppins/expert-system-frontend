@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useSuspenseQueries } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -50,25 +50,44 @@ const Page: React.FC<PageProps> = ({ params }) => {
   const { setAttributes, setQuestions } = useRulePageStore((store) => store);
   const [selectQuestion, setSelectQuestion] = useState<Option>(allQuestionSelect);
 
-  const system_id = useMemo(() => Number(params.system_id) ?? -1, [params]);
+  const system_id = useMemo(() => Number(params.system_id), [params]);
 
-  const { data: attributesData, isLoading: attributesIsLoading } = useSuspenseQuery({
-    queryKey: [ATTRIBUTES.GET, { user: user?.id, system: system_id }],
-    queryFn: async () => {
-      const res = await getAttributesWithValues(system_id);
-      setAttributes(res);
-      return res;
-    },
+  const [attributeQueryResult, questionsQueryResult, rulesQueryResult] = useSuspenseQueries({
+    queries: [
+      {
+        queryKey: [ATTRIBUTES.GET, { user: user?.id, system: system_id }],
+        queryFn: async () => {
+          const res = await getAttributesWithValues(system_id);
+          setAttributes(res);
+          return res;
+        },
+      },
+      {
+        queryKey: [QUESTIONS.GET, { user: user?.id, system: system_id }],
+        queryFn: async () => {
+          const res = await getQuestionsWithAnswers(system_id);
+          setQuestions(res);
+          return res;
+        },
+      },
+      {
+        queryKey: [RULES.GET, { user: user?.id, system: system_id }],
+        queryFn: async () => getRulesWithClausesAndEffects(system_id),
+      },
+    ],
   });
-
-  const { data: questionsData, isLoading: questionsIsLoading } = useSuspenseQuery({
-    queryKey: [QUESTIONS.GET, { user: user?.id, system: system_id }],
-    queryFn: async () => {
-      const res = await getQuestionsWithAnswers(system_id);
-      setQuestions(res);
-      return res;
-    },
-  });
+  const { attributesData, attributesIsLoading } = useMemo(
+    () => ({ attributesData: attributeQueryResult.data, attributesIsLoading: attributeQueryResult.isLoading }),
+    [attributeQueryResult],
+  );
+  const { questionsData, questionsIsLoading } = useMemo(
+    () => ({ questionsData: questionsQueryResult.data, questionsIsLoading: questionsQueryResult.isLoading }),
+    [questionsQueryResult],
+  );
+  const { rulesData, rulesIsLoading } = useMemo(
+    () => ({ rulesData: rulesQueryResult.data, rulesIsLoading: rulesQueryResult.isLoading }),
+    [rulesQueryResult],
+  );
 
   const questionsOptions = useMemo<Option[]>(
     () => [allQuestionSelect].concat(questionsData.map((question) => ({ label: question.body, value: question.id }))),
@@ -76,11 +95,6 @@ const Page: React.FC<PageProps> = ({ params }) => {
   );
 
   const handleQuestionSelect = useCallback((option: Option) => setSelectQuestion(option), []);
-
-  const { data: rulesData, isLoading: rulesIsLoading } = useSuspenseQuery({
-    queryKey: [RULES.GET, { user: user?.id, system: system_id }],
-    queryFn: () => getRulesWithClausesAndEffects(system_id),
-  });
 
   const filtredRules = useMemo(
     () =>

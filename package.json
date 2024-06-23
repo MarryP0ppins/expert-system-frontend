@@ -20,7 +20,7 @@
     "babel-plugin-react-compiler": "0.0.0-experimental-938cd9a-20240601",
     "js-cookie": "^3",
     "moment": "^2",
-    "next": "^15.0.0-canary.40",
+    "next": "15.0.0-canary.41",
     "react": "19.0.0-rc-3563387fe3-20240621",
     "react-content-loader": "^7",
     "react-dom": "19.0.0-rc-3563387fe3-20240621",

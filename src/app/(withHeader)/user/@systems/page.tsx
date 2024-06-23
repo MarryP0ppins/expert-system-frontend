@@ -34,7 +34,7 @@ export const Page: React.FC = () => {
     queryKey: [SYSTEMS.GET_USER, { user_id: user?.id, all_types: true }],
     queryFn: async () => await getSystems({ user_id: user?.id, all_types: true }),
   });
-  console.log(systemFile);
+
   const addMutate = useMutation({
     mutationFn: importSystem,
     onSuccess: (newSystem) => {
