@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { Control, useFieldArray } from 'react-hook-form';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -68,8 +68,6 @@ const RuleField: React.FC<RuleFieldProps> = ({
     name: `formData.${ruleIndex}.clauses`,
     keyName: 'arrayId',
   });
-
-  useEffect(() => console.log('render2'), [isVisible]);
 
   const handleAddClauseGroup = useCallback(
     () =>

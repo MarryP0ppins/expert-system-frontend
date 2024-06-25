@@ -27,8 +27,8 @@ export const updateQuestions = async (questions: TQuestionUpdate[]): Promise<TQu
   return data;
 };
 
-export const deleteQuestions = async (questionsIds: number[]) => {
-  const result = await deleteApiRequest(`/questions/multiple_delete`, questionsIds);
+export const deleteQuestions = async (questionsIds: number[]): Promise<number> => {
+  const result = await deleteApiRequest<number, number[]>(`/questions/multiple_delete`, questionsIds);
 
   return result;
 };

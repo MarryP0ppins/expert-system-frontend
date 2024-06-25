@@ -386,5 +386,3 @@ const Page: React.FC<PageProps> = ({ params }) => {
 };
 
 export default dynamic(() => Promise.resolve(Page), { ssr: false, loading: () => <Loader sizepx={116} /> });
-
-//

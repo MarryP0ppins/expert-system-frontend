@@ -210,10 +210,6 @@ const Page: React.FC<PageProps> = ({ params }) => {
             allAttributes={attributesData}
           />
         ))}
-        <div className={cnObjects('newObject')}>
-          <AddIcon width={30} height={30} className={cnObjects('newObject-addIcon')} onClick={handleAddObject} />
-          <Input className={cnObjects('newObject-input')} onClick={handleAddObject} placeholder="Новый обьект" />
-        </div>
         <div className={cnObjects('loadingScreen', { enabled: isLoading || isPending })} />
         <Button
           className={cnObjects('submitButton', { visible: isFormDirty() })}
@@ -223,6 +219,10 @@ const Page: React.FC<PageProps> = ({ params }) => {
           Сохранить
         </Button>
       </form>
+      <div className={cnObjects('newObject')}>
+        <AddIcon width={30} height={30} className={cnObjects('newObject-addIcon')} onClick={handleAddObject} />
+        <Input className={cnObjects('newObject-input')} onClick={handleAddObject} placeholder="Новый обьект" />
+      </div>
     </main>
   );
 };

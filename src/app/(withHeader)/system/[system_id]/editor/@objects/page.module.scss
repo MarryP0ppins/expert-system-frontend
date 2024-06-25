@@ -7,16 +7,16 @@
   width: 100%;
 
   &-form {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 600px);
     justify-content: space-evenly;
     gap: 24px;
     width: 100%;
-    margin-top: 20px;
-    margin-bottom: 76px;
+
+    margin-bottom: 24px;
     position: relative;
     padding: 0 16px;
+    padding-top: 20px;
   }
 
   &-newObject {
@@ -29,6 +29,7 @@
     padding: 14px;
     max-width: 1000px;
     width: 100%;
+    margin-bottom: 76px;
 
     &-input {
       width: 100%;

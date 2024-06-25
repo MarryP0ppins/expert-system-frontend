@@ -14,8 +14,8 @@ export const updateAnswers = async (answers: TAnswerUpdate[]): Promise<TAnswer[]
   return data;
 };
 
-export const deleteAnswers = async (answersIds: number[]) => {
-  const result = await deleteApiRequest(`/answers/multiple_delete`, answersIds);
+export const deleteAnswers = async (answersIds: number[]): Promise<number> => {
+  const result = await deleteApiRequest<number, number[]>(`/answers/multiple_delete`, answersIds);
 
   return result;
 };

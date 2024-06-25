@@ -19,9 +19,14 @@ import QuestionField from '@/components/QuestionField';
 import { QUESTIONS } from '@/constants';
 import AddIcon from '@/icons/AddIcon';
 import useUserStore from '@/store/userStore';
-import { TAnswerNew, TAnswerUpdate } from '@/types/answers';
-import { TQuestionUpdate, TQuestionWithAnswersForm, TQuestionWithAnswersNew } from '@/types/questions';
-import { classname } from '@/utils';
+import { TAnswer, TAnswerNew, TAnswerUpdate } from '@/types/answers';
+import {
+  TQuestionUpdate,
+  TQuestionWithAnswers,
+  TQuestionWithAnswersForm,
+  TQuestionWithAnswersNew,
+} from '@/types/questions';
+import { classname, normilizeQuestionsWithAnswers, objectPromiseAll } from '@/utils';
 import { formQuestionWithAnswersValidation } from '@/validation/questions';
 
 import classes from './page.module.scss';
@@ -30,6 +35,15 @@ const cnQuestions = classname(classes, 'editor-questions');
 
 type PageProps = {
   params: { system_id: number };
+};
+
+export type TResponseMutate = {
+  createQuestionsWithAnswers?: Promise<TQuestionWithAnswers[]>;
+  updateQuestions?: Promise<TQuestionWithAnswers[]>;
+  createAnswers?: Promise<TAnswer[]>;
+  updateAnswers?: Promise<TAnswer[]>;
+  deleteQuestions?: Promise<number>;
+  deleteAnswers?: Promise<number>;
 };
 
 const Page: React.FC<PageProps> = ({ params }) => {
@@ -49,6 +63,7 @@ const Page: React.FC<PageProps> = ({ params }) => {
     control,
     handleSubmit,
     reset,
+    getValues,
     formState: { dirtyFields, isValid },
   } = useForm<TQuestionWithAnswersForm>({
     defaultValues: { formData: data },
@@ -56,9 +71,12 @@ const Page: React.FC<PageProps> = ({ params }) => {
     mode: 'all',
   });
   const { mutate, isPending } = useMutation({
-    mutationFn: (responseList: Promise<unknown>[]) => Promise.allSettled(responseList),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: [QUESTIONS.GET, { user: user?.id, system: system_id }] }),
+    mutationFn: (responseList: TResponseMutate) => objectPromiseAll(responseList),
+    onSuccess: (data) =>
+      queryClient.setQueryData<TQuestionWithAnswers[]>(
+        [QUESTIONS.GET, { user: user?.id, system: system_id }],
+        normilizeQuestionsWithAnswers(getValues(), data, toDelete),
+      ),
     onSettled: () => setToDelete({ questions: [], answers: [] }),
   });
 
@@ -86,11 +104,15 @@ const Page: React.FC<PageProps> = ({ params }) => {
       form.formData.forEach((question, questionIndex) => {
         const newAnswersNewQuestions: string[] = [];
 
+        if (toDelete.questions.includes(question.id)) {
+          if (!questionsDelete.includes(question.id)) {
+            questionsDelete.push(question.id);
+          }
+          return;
+        }
+
         question.answers.forEach((answer, answerIndex) => {
           switch (true) {
-            case toDelete.questions.includes(question.id):
-              questionsDelete.push(question.id);
-              return;
             case !question.with_chooses:
               answersDelete.push(answer.id);
               return;
@@ -133,24 +155,24 @@ const Page: React.FC<PageProps> = ({ params }) => {
         }
       });
 
-      const responses = [];
+      const responses: TResponseMutate = {};
       if (questionsNew.length) {
-        responses.push(createQuestionsWithAnswers(questionsNew));
+        responses.createQuestionsWithAnswers = createQuestionsWithAnswers(questionsNew);
       }
       if (questionsUpdate.length) {
-        responses.push(updateQuestions(questionsUpdate));
+        responses.updateQuestions = updateQuestions(questionsUpdate);
       }
       if (answersNew.length) {
-        responses.push(createAnswers(answersNew));
+        responses.createAnswers = createAnswers(answersNew);
       }
       if (answersUpdate.length) {
-        responses.push(updateAnswers(answersUpdate));
+        responses.updateAnswers = updateAnswers(answersUpdate);
       }
       if (questionsDelete.length) {
-        responses.push(deleteQuestions(questionsDelete));
+        responses.deleteQuestions = deleteQuestions(questionsDelete);
       }
       if (answersDelete.length) {
-        responses.push(deleteAnswers(answersDelete));
+        responses.deleteAnswers = deleteAnswers(answersDelete);
       }
 
       mutate(responses);
