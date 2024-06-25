@@ -37,11 +37,11 @@ const Page: React.FC<PageProps> = ({ params }) => {
   const system_id = useMemo(() => Number(params.system_id) ?? -1, [params]);
 
   const { data } = useSuspenseQuery({
-    queryKey: [SYSTEMS.RETRIEVE, { user_id: user?.id, system_id: system_id }],
+    queryKey: [SYSTEMS.RETRIEVE, { system: system_id }],
     queryFn: async () => await getSystemOne(system_id),
     initialData: () =>
       queryClient
-        .getQueryData<TSystemsWithPage>([SYSTEMS.GET_USER, { user_id: user?.id, all_types: true }])
+        .getQueryData<TSystemsWithPage>([SYSTEMS.GET_USER, { user: user?.id, all_types: true }])
         ?.systems.find((system) => system.id === system_id),
   });
 

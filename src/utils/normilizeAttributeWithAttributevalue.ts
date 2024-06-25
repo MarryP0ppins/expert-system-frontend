@@ -1,7 +1,6 @@
-import { TAnswer } from '@/types/answers';
 import { TResponseAwaitedAttributePageMutate } from '@/types/attributePage';
-import { TAttributeValue } from '@/types/attributeValues';
 import { TAttributeWithAttributeValues } from '@/types/attributes';
+import { TAttributeValue } from '@/types/attributeValues';
 
 const normilizeAttributeWithAttributevalue = (
   data: TAttributeWithAttributeValues[],

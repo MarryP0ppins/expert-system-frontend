@@ -31,7 +31,7 @@ export const Page: React.FC = () => {
   const [systemFile, setSystemFile] = useState<File>();
 
   const { data, isSuccess, isLoading } = useSuspenseQuery({
-    queryKey: [SYSTEMS.GET_USER, { user_id: user?.id, all_types: true }],
+    queryKey: [SYSTEMS.GET_USER, { user: user?.id, all_types: true }],
     queryFn: async () => await getSystems({ user_id: user?.id, all_types: true }),
   });
 
@@ -39,7 +39,7 @@ export const Page: React.FC = () => {
     mutationFn: importSystem,
     onSuccess: (newSystem) => {
       queryClient.setQueryData<TSystemsWithPage>(
-        [SYSTEMS.GET_USER, { user_id: user?.id, all_types: true }],
+        [SYSTEMS.GET_USER, { user: user?.id, all_types: true }],
         (old?: TSystemsWithPage) => ({
           pages: old?.pages ?? 1,
           systems: [newSystem].concat(data.systems),
@@ -51,13 +51,13 @@ export const Page: React.FC = () => {
   const mutate = useMutation({
     mutationFn: deleteSystem,
     onMutate: async (data) => {
-      await queryClient.cancelQueries({ queryKey: [SYSTEMS.GET_USER, { user_id: user?.id, all_types: true }] });
+      await queryClient.cancelQueries({ queryKey: [SYSTEMS.GET_USER, { user: user?.id, all_types: true }] });
       const previousTodos = queryClient.getQueryData<TSystemsWithPage>([
         SYSTEMS.GET_USER,
-        { user_id: user?.id, all_types: true },
+        { user: user?.id, all_types: true },
       ]);
       queryClient.setQueryData<TSystemsWithPage>(
-        [SYSTEMS.GET_USER, { user_id: user?.id, all_types: true }],
+        [SYSTEMS.GET_USER, { user: user?.id, all_types: true }],
         (old?: TSystemsWithPage) => ({
           pages: old?.pages ?? 1,
           systems: old?.systems.filter((system) => system.id !== data.system_id) ?? [],
@@ -67,12 +67,12 @@ export const Page: React.FC = () => {
     },
     onError: (err, newTodo, context) => {
       queryClient.setQueryData<TSystemsWithPage>(
-        [SYSTEMS.GET_USER, { user_id: user?.id, all_types: true }],
+        [SYSTEMS.GET_USER, { user: user?.id, all_types: true }],
         context?.previousTodos,
       );
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: [SYSTEMS.GET_USER, { user_id: user?.id, all_types: true }] });
+      queryClient.invalidateQueries({ queryKey: [SYSTEMS.GET_USER, { user: user?.id, all_types: true }] });
     },
   });
 

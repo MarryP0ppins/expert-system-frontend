@@ -22,7 +22,6 @@ import Loader from '@/components/Loader';
 import ObjectField from '@/components/ObjectField';
 import { ATTRIBUTES, OBJECTS } from '@/constants';
 import AddIcon from '@/icons/AddIcon';
-import useUserStore from '@/store/userStore';
 import { TObjectAttributeAttributeValueNew } from '@/types/objectAttributeAttributeValue';
 import { TObjectUpdate, TObjectWithAttrValues, TObjectWithAttrValuesForm, TObjectWithIdsNew } from '@/types/objects';
 import { classname } from '@/utils';
@@ -38,19 +37,18 @@ type PageProps = {
 
 const Page: React.FC<PageProps> = ({ params }) => {
   const queryClient = useQueryClient();
-  const user = useUserStore((store) => store.user);
 
   const [toDelete, setToDelete] = useState<number[]>([]);
 
   const system_id = useMemo(() => Number(params.system_id) ?? -1, [params]);
 
   const { data: objectsData, isLoading: objectsIsLoading } = useSuspenseQuery({
-    queryKey: [OBJECTS.GET, { user: user?.id, system: system_id }],
+    queryKey: [OBJECTS.GET, { system: system_id }],
     queryFn: () => getObjectsWithAttrValues(system_id),
   });
 
   const { data: attributesData, isLoading: attributesIsLoading } = useSuspenseQuery({
-    queryKey: [ATTRIBUTES.GET, { user: user?.id, system: system_id }],
+    queryKey: [ATTRIBUTES.GET, { system: system_id }],
     queryFn: () => getAttributesWithValues(system_id),
   });
 
@@ -89,7 +87,7 @@ const Page: React.FC<PageProps> = ({ params }) => {
   });
   const { mutate, isPending } = useMutation({
     mutationFn: (responseList: Promise<unknown>[]) => Promise.allSettled(responseList),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: [OBJECTS.GET, { user: user?.id, system: system_id }] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: [OBJECTS.GET, { system: system_id }] }),
     onSettled: () => setToDelete([]),
   });
 

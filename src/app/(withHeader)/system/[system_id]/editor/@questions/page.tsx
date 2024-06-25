@@ -18,7 +18,6 @@ import Loader from '@/components/Loader';
 import QuestionField from '@/components/QuestionField';
 import { QUESTIONS } from '@/constants';
 import AddIcon from '@/icons/AddIcon';
-import useUserStore from '@/store/userStore';
 import { TAnswerNew, TAnswerUpdate } from '@/types/answers';
 import { TResponseQuestionPageMutate } from '@/types/questionPage';
 import {
@@ -40,14 +39,13 @@ type PageProps = {
 
 const Page: React.FC<PageProps> = ({ params }) => {
   const queryClient = useQueryClient();
-  const user = useUserStore((store) => store.user);
 
   const [toDelete, setToDelete] = useState({ questions: [] as number[], answers: [] as number[] });
 
   const system_id = useMemo(() => Number(params.system_id) ?? -1, [params]);
 
   const { data, isLoading } = useSuspenseQuery({
-    queryKey: [QUESTIONS.GET, { user: user?.id, system: system_id }],
+    queryKey: [QUESTIONS.GET, { system: system_id }],
     queryFn: () => getQuestionsWithAnswers(system_id),
   });
 
@@ -66,7 +64,7 @@ const Page: React.FC<PageProps> = ({ params }) => {
     mutationFn: (responseList: TResponseQuestionPageMutate) => objectPromiseAll(responseList),
     onSuccess: (data) =>
       queryClient.setQueryData<TQuestionWithAnswers[]>(
-        [QUESTIONS.GET, { user: user?.id, system: system_id }],
+        [QUESTIONS.GET, { system: system_id }],
         normilizeQuestionsWithAnswers(getValues(), data, toDelete),
       ),
     onSettled: () => setToDelete({ questions: [], answers: [] }),

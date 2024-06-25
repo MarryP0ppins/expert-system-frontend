@@ -44,14 +44,14 @@ const Page: React.FC = () => {
   const { mutate, isPending, error, status, data } = useMutation<TSystem, TErrorResponse, TSystemNew>({
     mutationFn: createSystem,
     onSuccess: (data) => {
-      queryClient.setQueryData([SYSTEMS.RETRIEVE, { user_id: user?.id, system_id: data.id }], data);
+      queryClient.setQueryData([SYSTEMS.RETRIEVE, { system: data.id }], data);
       const user_systems = queryClient.getQueryData<TSystemsWithPage>([
         SYSTEMS.GET_USER,
-        { user_id: user?.id, all_types: true },
+        { user: user?.id, all_types: true },
       ]);
       if (user_systems?.systems.length) {
         queryClient.setQueryData<TSystemsWithPage>(
-          [SYSTEMS.GET_USER, { user_id: user?.id, all_types: true }],
+          [SYSTEMS.GET_USER, { user: user?.id, all_types: true }],
           (old?: TSystemsWithPage) => ({
             pages: old?.pages ?? 1,
             systems: [data].concat(old?.systems ?? []),
@@ -66,10 +66,10 @@ const Page: React.FC = () => {
   const handleFormSubmit = useCallback((data: TSystemNew) => mutate(data), [mutate]);
 
   const formWatch = watch();
-
+  console.log(status);
   useEffect(() => {
     if (status === 'success') {
-      router.push(`/system/${data.id}/editor`);
+      router.push(`/system/${data?.id}/editor`);
     }
   }, [data, isPending, router, status]);
 

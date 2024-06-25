@@ -18,7 +18,6 @@ import Input from '@/components/Input';
 import Loader from '@/components/Loader';
 import { ATTRIBUTES } from '@/constants';
 import AddIcon from '@/icons/AddIcon';
-import useUserStore from '@/store/userStore';
 import { TResponseAttributePageMutate } from '@/types/attributePage';
 import { TAttributeUpdate, TAttributeWithAttributeValues, TAttributeWithAttributeValuesNew } from '@/types/attributes';
 import { TAttributeValueNew, TAttributeValueUpdate } from '@/types/attributeValues';
@@ -35,14 +34,12 @@ type PageProps = {
 };
 
 const Page: React.FC<PageProps> = ({ params }) => {
-  const user = useUserStore((store) => store.user);
-
   const [toDelete, setToDelete] = useState({ attributes: [] as number[], attrValues: [] as number[] });
 
   const system_id = useMemo(() => Number(params.system_id), [params]);
 
   const { data, isLoading } = useSuspenseQuery({
-    queryKey: [ATTRIBUTES.GET, { user: user?.id, system: system_id }],
+    queryKey: [ATTRIBUTES.GET, { system: system_id }],
     queryFn: () => getAttributesWithValues(system_id),
   });
 
@@ -54,6 +51,7 @@ const Page: React.FC<PageProps> = ({ params }) => {
     formState: { isValid, dirtyFields },
   } = useForm<{ formData: TAttributeWithAttributeValues[] }>({
     resolver: zodResolver(formAttrWithValuesValidation),
+    defaultValues: { formData: data },
     mode: 'all',
   });
 

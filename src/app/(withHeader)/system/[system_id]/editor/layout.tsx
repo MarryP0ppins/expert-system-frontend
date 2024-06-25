@@ -61,11 +61,11 @@ const Layout: React.FC<SystemEditorPageLayoutProps> = ({ system, attributes, obj
   const [section, setSection] = useState<Section>(getSection(searchParams.get('section')));
   const queryClient = useQueryClient();
   const { data: systemData, status } = useQuery({
-    queryKey: [SYSTEMS.RETRIEVE, { user: user?.id, system: system_id }],
+    queryKey: [SYSTEMS.RETRIEVE, { system: system_id }],
     queryFn: async () => await getSystemOne(system_id ?? -1),
     initialData: () =>
       queryClient
-        .getQueryData<TSystemsWithPage>([SYSTEMS.GET_USER, { user_id: user?.id, all_types: true }])
+        .getQueryData<TSystemsWithPage>([SYSTEMS.GET_USER, { user: user?.id, all_types: true }])
         ?.systems.find((system) => system.id === system_id),
   });
 
@@ -78,22 +78,22 @@ const Layout: React.FC<SystemEditorPageLayoutProps> = ({ system, attributes, obj
   const [attributeQueryResult, questionsQueryResult] = useQueries({
     queries: [
       {
-        queryKey: [ATTRIBUTES.GET, { user: user?.id, system: system_id }],
+        queryKey: [ATTRIBUTES.GET, { system: system_id }],
         queryFn: async () => getAttributesWithValues(system_id ?? -1),
         enabled: !!systemData?.id && ![Section.ATTRIBUTES, Section.RULES].includes(section),
       },
       {
-        queryKey: [QUESTIONS.GET, { user: user?.id, system: system_id }],
+        queryKey: [QUESTIONS.GET, { system: system_id }],
         queryFn: async () => getQuestionsWithAnswers(system_id ?? -1),
         enabled: !!systemData?.id && ![Section.QUESTIONS, Section.RULES].includes(section),
       },
       {
-        queryKey: [RULES.GET, { user: user?.id, system: system_id }],
+        queryKey: [RULES.GET, { system: system_id }],
         queryFn: async () => getRulesWithClausesAndEffects(system_id ?? -1),
         enabled: !!systemData?.id && section !== Section.RULES,
       },
       {
-        queryKey: [OBJECTS.GET, { user: user?.id, system: system_id }],
+        queryKey: [OBJECTS.GET, { system: system_id }],
         queryFn: async () => getObjectsWithAttrValues(system_id ?? -1),
         enabled: !!systemData?.id && section !== Section.OBJECTS,
       },

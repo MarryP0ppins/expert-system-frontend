@@ -42,7 +42,7 @@ const Page: React.FC<SystemTestPageProps> = ({ params }) => {
   const [testResults, setTestResults] = useState<{ key: string; value: number }[]>([]);
 
   const { data: testData } = useSuspenseQuery({
-    queryKey: [SYSTEMS.TEST, { system_id: system_id }],
+    queryKey: [SYSTEMS.TEST, { system: system_id }],
     queryFn: () => getSystemTest(system_id),
   });
 

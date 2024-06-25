@@ -23,7 +23,6 @@ import Text from '@/components/Text';
 import { ATTRIBUTES, OPERATOR, QUESTIONS, RULES } from '@/constants';
 import AddIcon from '@/icons/AddIcon';
 import useRulePageStore from '@/store/rulePageStore';
-import useUserStore from '@/store/userStore';
 import { TClauseForForm, TClauseNew, TClauseUpdate } from '@/types/clauses';
 import { TRuleAttributeAttributeValueNew } from '@/types/ruleAttributeAttributeValue';
 import { TRuleQuestionAnswerNew } from '@/types/ruleQuestionAnswer';
@@ -46,7 +45,6 @@ const allQuestionSelect: Option = {
 
 const Page: React.FC<PageProps> = ({ params }) => {
   const queryClient = useQueryClient();
-  const user = useUserStore((store) => store.user);
   const { setAttributes, setQuestions } = useRulePageStore((store) => store);
   const [selectQuestion, setSelectQuestion] = useState<Option>(allQuestionSelect);
 
@@ -55,7 +53,7 @@ const Page: React.FC<PageProps> = ({ params }) => {
   const [attributeQueryResult, questionsQueryResult, rulesQueryResult] = useSuspenseQueries({
     queries: [
       {
-        queryKey: [ATTRIBUTES.GET, { user: user?.id, system: system_id }],
+        queryKey: [ATTRIBUTES.GET, { system: system_id }],
         queryFn: async () => {
           const res = await getAttributesWithValues(system_id);
           setAttributes(res);
@@ -63,7 +61,7 @@ const Page: React.FC<PageProps> = ({ params }) => {
         },
       },
       {
-        queryKey: [QUESTIONS.GET, { user: user?.id, system: system_id }],
+        queryKey: [QUESTIONS.GET, { system: system_id }],
         queryFn: async () => {
           const res = await getQuestionsWithAnswers(system_id);
           setQuestions(res);
@@ -71,7 +69,7 @@ const Page: React.FC<PageProps> = ({ params }) => {
         },
       },
       {
-        queryKey: [RULES.GET, { user: user?.id, system: system_id }],
+        queryKey: [RULES.GET, { system: system_id }],
         queryFn: async () => getRulesWithClausesAndEffects(system_id),
       },
     ],
@@ -150,7 +148,7 @@ const Page: React.FC<PageProps> = ({ params }) => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: (responseList: Promise<unknown>[]) => Promise.allSettled(responseList),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: [RULES.GET, { user: user?.id, system: system_id }] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: [RULES.GET, { system: system_id }] }),
   });
 
   const { fields, append, remove, update } = useFieldArray({ control, name: 'formData', keyName: 'arrayId' });
