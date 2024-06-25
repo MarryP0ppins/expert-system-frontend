@@ -17,8 +17,8 @@ export const updateAttributesValues = async (attrValues: TAttributeValueUpdate[]
   return data;
 };
 
-export const deleteAttributesValues = async (attrValuesIds: number[]) => {
-  const result = await deleteApiRequest(`/attributevalues/multiple_delete`, attrValuesIds);
+export const deleteAttributesValues = async (attrValuesIds: number[]): Promise<number> => {
+  const result = await deleteApiRequest<number, number[]>(`/attributevalues/multiple_delete`, attrValuesIds);
 
   return result;
 };

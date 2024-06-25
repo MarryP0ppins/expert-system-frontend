@@ -79,11 +79,7 @@ const Layout: React.FC<SystemEditorPageLayoutProps> = ({ system, attributes, obj
     queries: [
       {
         queryKey: [ATTRIBUTES.GET, { user: user?.id, system: system_id }],
-        queryFn: async () => {
-          const res = await getAttributesWithValues(system_id ?? -1);
-          console.log('log layout');
-          return res;
-        },
+        queryFn: async () => getAttributesWithValues(system_id ?? -1),
         enabled: !!systemData?.id && ![Section.ATTRIBUTES, Section.RULES].includes(section),
       },
       {
@@ -98,10 +94,7 @@ const Layout: React.FC<SystemEditorPageLayoutProps> = ({ system, attributes, obj
       },
       {
         queryKey: [OBJECTS.GET, { user: user?.id, system: system_id }],
-        queryFn: async () => {
-          console.log('log layout object');
-          return getObjectsWithAttrValues(system_id ?? -1);
-        },
+        queryFn: async () => getObjectsWithAttrValues(system_id ?? -1),
         enabled: !!systemData?.id && section !== Section.OBJECTS,
       },
     ],

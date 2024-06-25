@@ -1,18 +1,10 @@
 import { TAnswer } from '@/types/answers';
+import { TResponseAwaitedQuestionPageMutate } from '@/types/questionPage';
 import { TQuestionWithAnswers, TQuestionWithAnswersForm } from '@/types/questions';
-
-export type TResponseAwaitedMutate = {
-  createQuestionsWithAnswers?: TQuestionWithAnswers[];
-  updateQuestions?: TQuestionWithAnswers[];
-  createAnswers?: TAnswer[];
-  updateAnswers?: TAnswer[];
-  deleteQuestions?: number;
-  deleteAnswers?: number;
-};
 
 const normilizeQuestionsWithAnswers = (
   data: TQuestionWithAnswersForm,
-  responsesData: TResponseAwaitedMutate,
+  responsesData: TResponseAwaitedQuestionPageMutate,
   toDelete: { questions: number[]; answers: number[] },
 ): TQuestionWithAnswers[] => {
   const questionsWithAnswers: TQuestionWithAnswers[] = [];

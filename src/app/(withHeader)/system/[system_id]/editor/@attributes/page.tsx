@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 
 import {
@@ -19,9 +19,11 @@ import Loader from '@/components/Loader';
 import { ATTRIBUTES } from '@/constants';
 import AddIcon from '@/icons/AddIcon';
 import useUserStore from '@/store/userStore';
+import { TResponseAttributePageMutate } from '@/types/attributePage';
 import { TAttributeUpdate, TAttributeWithAttributeValues, TAttributeWithAttributeValuesNew } from '@/types/attributes';
 import { TAttributeValueNew, TAttributeValueUpdate } from '@/types/attributeValues';
-import { classname } from '@/utils';
+import { classname, objectPromiseAll } from '@/utils';
+import normilizeAttributeWithAttributevalue from '@/utils/normilizeAttributeWithAttributevalue';
 import { formAttrWithValuesValidation } from '@/validation/attributes';
 
 import classes from './page.module.scss';
@@ -33,7 +35,6 @@ type PageProps = {
 };
 
 const Page: React.FC<PageProps> = ({ params }) => {
-  const queryClient = useQueryClient();
   const user = useUserStore((store) => store.user);
 
   const [toDelete, setToDelete] = useState({ attributes: [] as number[], attrValues: [] as number[] });
@@ -49,6 +50,7 @@ const Page: React.FC<PageProps> = ({ params }) => {
     control,
     handleSubmit,
     reset,
+    getValues,
     formState: { isValid, dirtyFields },
   } = useForm<{ formData: TAttributeWithAttributeValues[] }>({
     resolver: zodResolver(formAttrWithValuesValidation),
@@ -56,9 +58,8 @@ const Page: React.FC<PageProps> = ({ params }) => {
   });
 
   const { mutate, isPending } = useMutation({
-    mutationFn: (responseList: Promise<unknown>[]) => Promise.allSettled(responseList),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: [ATTRIBUTES.GET, { user: user?.id, system: system_id }] }),
+    mutationFn: (responseList: TResponseAttributePageMutate) => objectPromiseAll(responseList),
+    onSuccess: (data) => reset(normilizeAttributeWithAttributevalue(getValues('formData'), data, toDelete)),
     onSettled: () => setToDelete({ attributes: [], attrValues: [] }),
   });
 
@@ -114,24 +115,24 @@ const Page: React.FC<PageProps> = ({ params }) => {
         }
       });
 
-      const responses = [];
+      const responses: TResponseAttributePageMutate = {};
       if (attrNew.length) {
-        responses.push(createAttributesWithValues(attrNew));
+        responses.createAttributesWithValues = createAttributesWithValues(attrNew);
       }
       if (attrUpdate.length) {
-        responses.push(updateAttributes(attrUpdate));
+        responses.updateAttributes = updateAttributes(attrUpdate);
       }
       if (attrValueNew.length) {
-        responses.push(createAttributesValues(attrValueNew));
+        responses.createAttributesValues = createAttributesValues(attrValueNew);
       }
       if (attrValueUpdate.length) {
-        responses.push(updateAttributesValues(attrValueUpdate));
+        responses.updateAttributesValues = updateAttributesValues(attrValueUpdate);
       }
       if (toDelete.attributes.length) {
-        responses.push(deleteAttributes(toDelete.attributes));
+        responses.deleteAttributes = deleteAttributes(toDelete.attributes);
       }
       if (attrValueDelete.length) {
-        responses.push(deleteAttributesValues(attrValueDelete));
+        responses.deleteAttributesValues = deleteAttributesValues(attrValueDelete);
       }
 
       mutate(responses);

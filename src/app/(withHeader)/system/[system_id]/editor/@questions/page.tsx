@@ -19,7 +19,8 @@ import QuestionField from '@/components/QuestionField';
 import { QUESTIONS } from '@/constants';
 import AddIcon from '@/icons/AddIcon';
 import useUserStore from '@/store/userStore';
-import { TAnswer, TAnswerNew, TAnswerUpdate } from '@/types/answers';
+import { TAnswerNew, TAnswerUpdate } from '@/types/answers';
+import { TResponseQuestionPageMutate } from '@/types/questionPage';
 import {
   TQuestionUpdate,
   TQuestionWithAnswers,
@@ -35,15 +36,6 @@ const cnQuestions = classname(classes, 'editor-questions');
 
 type PageProps = {
   params: { system_id: number };
-};
-
-export type TResponseMutate = {
-  createQuestionsWithAnswers?: Promise<TQuestionWithAnswers[]>;
-  updateQuestions?: Promise<TQuestionWithAnswers[]>;
-  createAnswers?: Promise<TAnswer[]>;
-  updateAnswers?: Promise<TAnswer[]>;
-  deleteQuestions?: Promise<number>;
-  deleteAnswers?: Promise<number>;
 };
 
 const Page: React.FC<PageProps> = ({ params }) => {
@@ -71,7 +63,7 @@ const Page: React.FC<PageProps> = ({ params }) => {
     mode: 'all',
   });
   const { mutate, isPending } = useMutation({
-    mutationFn: (responseList: TResponseMutate) => objectPromiseAll(responseList),
+    mutationFn: (responseList: TResponseQuestionPageMutate) => objectPromiseAll(responseList),
     onSuccess: (data) =>
       queryClient.setQueryData<TQuestionWithAnswers[]>(
         [QUESTIONS.GET, { user: user?.id, system: system_id }],
@@ -155,7 +147,7 @@ const Page: React.FC<PageProps> = ({ params }) => {
         }
       });
 
-      const responses: TResponseMutate = {};
+      const responses: TResponseQuestionPageMutate = {};
       if (questionsNew.length) {
         responses.createQuestionsWithAnswers = createQuestionsWithAnswers(questionsNew);
       }
