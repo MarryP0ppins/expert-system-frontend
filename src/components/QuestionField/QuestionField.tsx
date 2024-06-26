@@ -3,6 +3,7 @@ import { Control, useController, useFieldArray } from 'react-hook-form';
 
 import AddIcon from '@/icons/AddIcon';
 import CloseIcon from '@/icons/CloseIcon';
+import { TAnswerForForm } from '@/types/answers';
 import { TQuestionWithAnswersForm } from '@/types/questions';
 import { classname } from '@/utils/classname';
 
@@ -21,8 +22,6 @@ type QuestionFieldProps = {
   questionIndex: number;
   control: Control<TQuestionWithAnswersForm>;
   onDelete: () => void;
-  onAnswerDelete: (AnswerId: number) => void;
-  deletedSubFieldIds: number[];
 };
 
 const cnFields = classname(classes, 'fieldWithFields');
@@ -33,8 +32,6 @@ const QuestionField: React.FC<QuestionFieldProps> = ({
   questionIndex,
   questionId,
   onDelete,
-  onAnswerDelete,
-  deletedSubFieldIds,
 }) => {
   const {
     field: bodyField,
@@ -42,24 +39,24 @@ const QuestionField: React.FC<QuestionFieldProps> = ({
   } = useController({ control, name: `formData.${questionIndex}.body` });
   const { field: choosesField } = useController({ control, name: `formData.${questionIndex}.with_chooses` });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, update } = useFieldArray({
     control,
     name: `formData.${questionIndex}.answers`,
     keyName: 'arrayId',
   });
 
   const handleDeleteAnswer = useCallback(
-    (AnswerId: number, AnswerIndex: number) => () => {
-      if (AnswerId === -1) {
-        remove(AnswerIndex);
+    (answer: TAnswerForForm, answerIndex: number) => () => {
+      if (answer.id === -1) {
+        remove(answerIndex);
       } else {
-        onAnswerDelete(AnswerId);
+        update(answerIndex, { ...answer, deleted: true });
       }
     },
-    [onAnswerDelete, remove],
+    [remove, update],
   );
   const handleAddAnswer = useCallback(
-    () => append({ id: -1, question_id: questionId, body: '' }),
+    () => append({ id: -1, question_id: questionId, body: '', deleted: false }),
     [append, questionId],
   );
 
@@ -91,14 +88,14 @@ const QuestionField: React.FC<QuestionFieldProps> = ({
       </div>
       {choosesField.value && (
         <div className={cnFields('attrValues')}>
-          {fields.map((attrValue, answerIndex) => (
+          {fields.map((answer, answerIndex) => (
             <AnswerField
-              key={attrValue.arrayId}
-              isVisible={!deletedSubFieldIds.includes(attrValue.id)}
+              key={answer.arrayId}
+              isVisible={!answer.deleted}
               control={control}
               questionIndex={questionIndex}
               answerIndex={answerIndex}
-              onDeleteClick={handleDeleteAnswer(attrValue.id, answerIndex)}
+              onDeleteClick={handleDeleteAnswer(answer, answerIndex)}
             />
           ))}
           <div className={cnFields('newValue')}>

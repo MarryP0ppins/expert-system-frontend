@@ -1,8 +1,9 @@
 import { z } from 'zod';
 
 import {
-  formQuestionWithAnswersValidation,
+  formQuestionWithAnswerValidation,
   questionUpdateValidation,
+  questionWithAnswerForFormValidation,
   questionWithAnswersNewValidation,
   questionWithAnswersValidation,
 } from '@/validation/questions';
@@ -13,4 +14,6 @@ export type TQuestionWithAnswersNew = z.infer<typeof questionWithAnswersNewValid
 
 export type TQuestionUpdate = z.infer<typeof questionUpdateValidation>;
 
-export type TQuestionWithAnswersForm = z.infer<typeof formQuestionWithAnswersValidation>;
+export type TQuestionWithAnswersForForm = z.infer<typeof questionWithAnswerForFormValidation>;
+
+export type TQuestionWithAnswersForm = z.infer<typeof formQuestionWithAnswerValidation>;

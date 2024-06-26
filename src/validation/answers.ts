@@ -9,3 +9,5 @@ export const answerValidation = z.object({
 export const answerUpdateValidation = answerValidation.omit({ question_id: true });
 
 export const answerNewValidation = answerValidation.omit({ id: true });
+
+export const answerForFormValidation = answerValidation.extend({ deleted: z.boolean().default(false) });
