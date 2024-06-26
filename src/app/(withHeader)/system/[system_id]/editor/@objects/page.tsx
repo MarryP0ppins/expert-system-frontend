@@ -24,7 +24,7 @@ import { ATTRIBUTES, OBJECTS } from '@/constants';
 import AddIcon from '@/icons/AddIcon';
 import { TObjectAttributeAttributeValueNew } from '@/types/objectAttributeAttributeValue';
 import { TObjectUpdate, TObjectWithAttrValues, TObjectWithAttrValuesForm, TObjectWithIdsNew } from '@/types/objects';
-import { classname } from '@/utils';
+import { classname } from '@/utils/classname';
 import { formObjectWithAttrValuesValidation } from '@/validation/objects';
 
 import classes from './page.module.scss';

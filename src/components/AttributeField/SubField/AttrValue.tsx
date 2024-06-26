@@ -4,7 +4,7 @@ import { Control, useController } from 'react-hook-form';
 import ErrorPopup from '@/components/ErrorPopup';
 import TrashIcon from '@/icons/TrashIcon';
 import { TAttributeWithAttributeValuesForm } from '@/types/attributes';
-import { classname } from '@/utils';
+import { classname } from '@/utils/classname';
 
 import Input from '../../Input';
 

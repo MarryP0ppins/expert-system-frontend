@@ -3,7 +3,8 @@ import Image from 'next/image';
 
 import CloseIcon from '@/icons/CloseIcon';
 import UploadIcon from '@/icons/UploadIcon';
-import { classname, imageUrl } from '@/utils';
+import { classname } from '@/utils/classname';
+import { imageUrl } from '@/utils/imageUrl';
 
 import Text, { TEXT_TAG, TEXT_VIEW } from '../Text';
 

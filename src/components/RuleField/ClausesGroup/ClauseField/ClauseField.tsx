@@ -6,7 +6,7 @@ import { OPERATOR, operatorOptions } from '@/constants';
 import TrashIcon from '@/icons/TrashIcon';
 import useRulePageStore from '@/store/rulePageStore';
 import { TRuleForm } from '@/types/rules';
-import { classname } from '@/utils';
+import { classname } from '@/utils/classname';
 import operatorToSymbol from '@/utils/operatorEnumToSymbol';
 
 import classes from './ClauseField.module.scss';

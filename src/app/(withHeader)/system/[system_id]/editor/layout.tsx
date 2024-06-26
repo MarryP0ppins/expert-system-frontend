@@ -13,7 +13,7 @@ import { ATTRIBUTES, OBJECTS, QUESTIONS, RULES, SYSTEMS } from '@/constants';
 import useRulePageStore from '@/store/rulePageStore';
 import useUserStore from '@/store/userStore';
 import { TSystemsWithPage } from '@/types/systems';
-import { classname } from '@/utils';
+import { classname } from '@/utils/classname';
 import { systemIdValidation } from '@/validation/searchParams';
 
 import classes from './layout.module.scss';

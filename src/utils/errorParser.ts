@@ -1,6 +1,6 @@
 import { TErrorResponse } from '@/types/error';
 
-const errorParser = (error: unknown): TErrorResponse => {
+export const errorParser = (error: unknown): TErrorResponse => {
   let object = {};
   try {
     object = new Object(JSON.parse(error as string));
@@ -26,5 +26,3 @@ const errorParser = (error: unknown): TErrorResponse => {
   console.log(err);
   return err;
 };
-
-export default errorParser;

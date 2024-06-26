@@ -2,7 +2,7 @@ import React from 'react';
 
 import Text, { TEXT_TAG, TEXT_VIEW } from '@/components/Text';
 import { INSTRACTIONS } from '@/constants';
-import { classname } from '@/utils';
+import { classname } from '@/utils/classname';
 
 import classes from './page.module.scss';
 

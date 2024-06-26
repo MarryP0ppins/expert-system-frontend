@@ -9,7 +9,7 @@ import { CardSkeleton } from '@/components/CardSkeleton';
 import Text, { TEXT_VIEW } from '@/components/Text';
 import { SYSTEMS } from '@/constants';
 import useSystemsSearchParamsStore from '@/store/systemsSearchParamsStore';
-import { classname } from '@/utils';
+import { classname } from '@/utils/classname';
 import { mainPageSearchParamsParse } from '@/utils/searchParams';
 
 import classes from './SystemsContainer.module.scss';

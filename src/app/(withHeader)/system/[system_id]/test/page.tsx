@@ -14,7 +14,7 @@ import { HISTORIES, SYSTEMS } from '@/constants';
 import useUserStore from '@/store/userStore';
 import { TAnswer } from '@/types/answers';
 import { TRule } from '@/types/rules';
-import { classname } from '@/utils';
+import { classname } from '@/utils/classname';
 import { clausesCheck } from '@/utils/clausesCheck';
 import { systemIdValidation } from '@/validation/searchParams';
 

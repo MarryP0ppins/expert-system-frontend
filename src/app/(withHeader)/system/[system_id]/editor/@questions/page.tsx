@@ -26,7 +26,9 @@ import {
   TQuestionWithAnswersForm,
   TQuestionWithAnswersNew,
 } from '@/types/questions';
-import { classname, normilizeQuestionsWithAnswers, objectPromiseAll } from '@/utils';
+import { classname } from '@/utils/classname';
+import { normilizeQuestionsWithAnswers } from '@/utils/normilizeQuestionsWithAnswers';
+import { objectPromiseAll } from '@/utils/objectPromiseAll';
 import { formQuestionWithAnswersValidation } from '@/validation/questions';
 
 import classes from './page.module.scss';

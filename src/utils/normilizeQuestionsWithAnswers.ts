@@ -2,7 +2,7 @@ import { TAnswer } from '@/types/answers';
 import { TResponseAwaitedQuestionPageMutate } from '@/types/questionPage';
 import { TQuestionWithAnswers, TQuestionWithAnswersForm } from '@/types/questions';
 
-const normilizeQuestionsWithAnswers = (
+export const normilizeQuestionsWithAnswers = (
   data: TQuestionWithAnswersForm,
   responsesData: TResponseAwaitedQuestionPageMutate,
   toDelete: { questions: number[]; answers: number[] },

@@ -17,7 +17,8 @@ import { USER } from '@/constants';
 import CloseIcon from '@/icons/CloseIcon';
 import useUserStore from '@/store/userStore';
 import { TUserUpdate } from '@/types/user';
-import { classname, errorParser } from '@/utils';
+import { classname } from '@/utils/classname';
+import { errorParser } from '@/utils/errorParser';
 import { userUpdateValidation } from '@/validation/user';
 
 import classes from './page.module.scss';

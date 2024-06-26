@@ -27,7 +27,7 @@ import { TClauseForForm, TClauseNew, TClauseUpdate } from '@/types/clauses';
 import { TRuleAttributeAttributeValueNew } from '@/types/ruleAttributeAttributeValue';
 import { TRuleQuestionAnswerNew } from '@/types/ruleQuestionAnswer';
 import { TRuleForForm, TRuleForm, TRuleNew } from '@/types/rules';
-import { classname } from '@/utils';
+import { classname } from '@/utils/classname';
 import { formRuleValidation } from '@/validation/rules';
 
 import classes from './page.module.scss';

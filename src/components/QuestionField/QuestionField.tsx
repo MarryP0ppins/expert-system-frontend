@@ -4,7 +4,7 @@ import { Control, useController, useFieldArray } from 'react-hook-form';
 import AddIcon from '@/icons/AddIcon';
 import CloseIcon from '@/icons/CloseIcon';
 import { TQuestionWithAnswersForm } from '@/types/questions';
-import { classname } from '@/utils';
+import { classname } from '@/utils/classname';
 
 import CheckBox from '../CheckBox';
 import ErrorPopup from '../ErrorPopup';

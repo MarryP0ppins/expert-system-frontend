@@ -1,6 +1,6 @@
 type PromisesObject<T> = { [K in keyof T]: Promise<T[K]> };
 
-const objectPromiseAll = async <T>(obj: PromisesObject<T>): Promise<T> => {
+export const objectPromiseAll = async <T>(obj: PromisesObject<T>): Promise<T> => {
   const keys = Object.keys(obj) as Array<keyof T>;
   const promises = keys.map((key) => obj[key]);
 
@@ -10,5 +10,3 @@ const objectPromiseAll = async <T>(obj: PromisesObject<T>): Promise<T> => {
     return acc;
   }, {} as T);
 };
-
-export default objectPromiseAll;

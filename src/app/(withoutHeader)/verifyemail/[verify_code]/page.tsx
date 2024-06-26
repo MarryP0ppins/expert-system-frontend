@@ -8,7 +8,8 @@ import Loader from '@/components/Loader';
 import Text from '@/components/Text';
 import { USER } from '@/constants';
 import useUserStore from '@/store/userStore';
-import { classname, errorParser } from '@/utils';
+import { classname } from '@/utils/classname';
+import { errorParser } from '@/utils/errorParser';
 import { verifyEmailValidation } from '@/validation/searchParams';
 
 import classes from './page.module.scss';

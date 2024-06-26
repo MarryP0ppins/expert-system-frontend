@@ -5,7 +5,7 @@ import AddIcon from '@/icons/AddIcon';
 import CloseIcon from '@/icons/CloseIcon';
 import { TAttributeWithAttributeValuesForm } from '@/types/attributes';
 import { TAttributeValueForForm } from '@/types/attributeValues';
-import { classname } from '@/utils';
+import { classname } from '@/utils/classname';
 
 import ErrorPopup from '../ErrorPopup';
 import Input from '../Input';

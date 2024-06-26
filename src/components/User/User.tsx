@@ -14,7 +14,7 @@ import AddIcon from '@/icons/AddIcon';
 import BookIcon from '@/icons/BookIcon';
 import LoginIcon from '@/icons/LoginIcon';
 import useUserStore from '@/store/userStore';
-import { classname } from '@/utils';
+import { classname } from '@/utils/classname';
 
 import Loader from '../Loader';
 import Text, { TEXT_TAG, TEXT_VIEW } from '../Text';

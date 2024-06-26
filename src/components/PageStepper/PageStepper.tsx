@@ -5,7 +5,7 @@ import { useShallow } from 'zustand/react/shallow';
 
 import { ArrowLeftIcon } from '@/icons';
 import useSystemsSearchParamsStore from '@/store/systemsSearchParamsStore';
-import { classname } from '@/utils';
+import { classname } from '@/utils/classname';
 import { mainPageSearchParamsParse } from '@/utils/searchParams';
 
 import Text, { TEXT_VIEW } from '../Text';

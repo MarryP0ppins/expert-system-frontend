@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { ArrowDownIcon } from '@/icons';
-import { classname } from '@/utils';
+import { classname } from '@/utils/classname';
 
 import { useClickOutside } from '../../hooks/useClickOutside';
 import Input from '../Input';

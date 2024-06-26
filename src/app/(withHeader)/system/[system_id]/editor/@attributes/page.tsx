@@ -5,13 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 
-import {
-  createAttributesWithValues,
-  deleteAttributes,
-  getAttributesWithValues,
-  updateAttributes,
-} from '@/api/services/attributes';
-import { createAttributesValues, deleteAttributesValues, updateAttributesValues } from '@/api/services/attributeValues';
+import { getAttributesWithValues } from '@/api/services/attributes';
 import AttributeField from '@/components/AttributeField';
 import Button from '@/components/Button';
 import Input from '@/components/Input';
@@ -20,19 +14,17 @@ import { ATTRIBUTES } from '@/constants';
 import AddIcon from '@/icons/AddIcon';
 import { TResponseAttributePageMutate } from '@/types/attributePage';
 import {
-  TAttributeUpdate,
   TAttributeWithAttributeValues,
   TAttributeWithAttributeValuesForForm,
   TAttributeWithAttributeValuesForm,
-  TAttributeWithAttributeValuesNew,
 } from '@/types/attributes';
-import { TAttributeValueNew, TAttributeValueUpdate } from '@/types/attributeValues';
 import {
-  classname,
+  handleFormSubmit,
   normilizeAttributeWithAttributevalue,
   normilizeResponseDataAttributeWithAttributevalue,
-  objectPromiseAll,
-} from '@/utils';
+} from '@/utils/attributeWithAttributeValuePage';
+import { classname } from '@/utils/classname';
+import { objectPromiseAll } from '@/utils/objectPromiseAll';
 import { formAttributeWithAttributeValuesValidation } from '@/validation/attributes';
 
 import classes from './page.module.scss';
@@ -91,73 +83,6 @@ const Page: React.FC<PageProps> = ({ params }) => {
     return isDirtyForm;
   }, [dirtyFields.formData, getValues]);
 
-  const handleFormSubmit = useCallback(
-    (form: TAttributeWithAttributeValuesForm) => {
-      const attrUpdate: TAttributeUpdate[] = [];
-      const attrValueUpdate: TAttributeValueUpdate[] = [];
-      const attrNew: TAttributeWithAttributeValuesNew[] = [];
-      const attrValueNew: TAttributeValueNew[] = [];
-      const atttributeDelete: number[] = [];
-      const attrValueDelete: number[] = [];
-
-      form.formData.forEach((attribute, attrIndex) => {
-        if (attribute.deleted) {
-          atttributeDelete.push(attribute.id);
-          return;
-        }
-        const newValuesNewAttribute: string[] = [];
-        attribute.values.forEach((attrValue, attrValueIndex) => {
-          if (!attrValue.deleted) {
-            if (attrValue.id === -1) {
-              if (attrValue.attribute_id === -1) {
-                newValuesNewAttribute.push(attrValue.value);
-              } else {
-                attrValueNew.push({ attribute_id: attrValue.attribute_id, value: attrValue.value });
-              }
-            }
-            if (
-              !dirtyFields.formData?.[attrIndex]?.values?.[attrValueIndex]?.id &&
-              dirtyFields.formData?.[attrIndex]?.values?.[attrValueIndex]?.value
-            ) {
-              attrValueUpdate.push({ id: attrValue.id, value: attrValue.value });
-            }
-          } else if (!attribute.deleted) {
-            attrValueDelete.push(attrValue.id);
-          }
-        });
-
-        if (attribute.id === -1) {
-          attrNew.push({ system_id: attribute.system_id, name: attribute.name, values_name: newValuesNewAttribute });
-        }
-        if (!dirtyFields.formData?.[attrIndex]?.id && dirtyFields.formData?.[attrIndex]?.name) {
-          attrUpdate.push({ id: attribute.id, name: attribute.name });
-        }
-      });
-
-      const responses: TResponseAttributePageMutate = {};
-      if (attrNew.length) {
-        responses.createAttributesWithValues = createAttributesWithValues(attrNew);
-      }
-      if (attrUpdate.length) {
-        responses.updateAttributes = updateAttributes(attrUpdate);
-      }
-      if (attrValueNew.length) {
-        responses.createAttributesValues = createAttributesValues(attrValueNew);
-      }
-      if (attrValueUpdate.length) {
-        responses.updateAttributesValues = updateAttributesValues(attrValueUpdate);
-      }
-      if (atttributeDelete.length) {
-        responses.deleteAttributes = deleteAttributes(atttributeDelete);
-      }
-      if (attrValueDelete.length) {
-        responses.deleteAttributesValues = deleteAttributesValues(attrValueDelete);
-      }
-
-      mutate(responses);
-    },
-    [dirtyFields, mutate],
-  );
   const handleAddAttr = useCallback(
     () => append({ id: -1, system_id: system_id, name: '', values: [], deleted: false }),
     [append, system_id],
@@ -175,7 +100,7 @@ const Page: React.FC<PageProps> = ({ params }) => {
 
   return (
     <main className={cnAttributes()}>
-      <form onSubmit={handleSubmit(handleFormSubmit)} className={cnAttributes('form')}>
+      <form onSubmit={handleSubmit(handleFormSubmit(dirtyFields, mutate))} className={cnAttributes('form')}>
         {fields.map((attribute, attrIndex) => (
           <AttributeField
             key={attribute.arrayId}

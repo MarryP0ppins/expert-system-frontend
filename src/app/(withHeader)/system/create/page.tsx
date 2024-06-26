@@ -17,7 +17,8 @@ import { SYSTEMS } from '@/constants';
 import useUserStore from '@/store/userStore';
 import { TErrorResponse } from '@/types/error';
 import { TSystem, TSystemNew, TSystemsWithPage } from '@/types/systems';
-import { classname, errorParser } from '@/utils';
+import { classname } from '@/utils/classname';
+import { errorParser } from '@/utils/errorParser';
 import { systemNewValidation } from '@/validation/system';
 
 import classes from './page.module.scss';

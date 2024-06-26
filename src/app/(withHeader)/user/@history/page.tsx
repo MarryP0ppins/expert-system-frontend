@@ -10,7 +10,7 @@ import Loader from '@/components/Loader';
 import Text, { TEXT_VIEW } from '@/components/Text';
 import { HISTORIES } from '@/constants';
 import useUserStore from '@/store/userStore';
-import { classname } from '@/utils';
+import { classname } from '@/utils/classname';
 
 import classes from './page.module.scss';
 

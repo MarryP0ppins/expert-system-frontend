@@ -16,7 +16,7 @@ import FileCheck from '@/icons/FileCheck';
 import useSystemStore from '@/store/systemStore';
 import useUserStore from '@/store/userStore';
 import { TSystemsWithPage } from '@/types/systems';
-import { classname } from '@/utils';
+import { classname } from '@/utils/classname';
 
 import classes from './page.module.scss';
 

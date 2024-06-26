@@ -11,7 +11,8 @@ import Input from '@/components/Input';
 import Text, { TEXT_VIEW } from '@/components/Text';
 import { USER } from '@/constants';
 import { ForgotPassword } from '@/types/user';
-import { classname, errorParser } from '@/utils';
+import { classname } from '@/utils/classname';
+import { errorParser } from '@/utils/errorParser';
 import { forgotPasswordValidation } from '@/validation/user';
 
 import classes from './page.module.scss';

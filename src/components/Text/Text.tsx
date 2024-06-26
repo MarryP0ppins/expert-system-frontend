@@ -1,6 +1,6 @@
 import React, { ReactHTML } from 'react';
 
-import { classname } from '@/utils';
+import { classname } from '@/utils/classname';
 
 import { TEXT_TAG, TEXT_VIEW, TEXT_WEIGHT } from './Text.types';
 

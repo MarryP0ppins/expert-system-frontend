@@ -1,6 +1,6 @@
 import { ClassNameFormatter, cn, NoStrictEntityMods } from '@bem-react/classname';
 
-const classname = (
+export const classname = (
   classes: Record<string, string>,
   blockName: string,
   elemName?: string | undefined,
@@ -13,5 +13,3 @@ const classname = (
         return prev + ' ' + classes[curr];
       }, '');
 };
-
-export default classname;

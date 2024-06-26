@@ -3,7 +3,7 @@ import { TRuleAttributeAttributeValue } from '@/types/ruleAttributeAttributeValu
 import { TRuleQuestionAnswer } from '@/types/ruleQuestionAnswer';
 import { TRule, TRuleForm } from '@/types/rules';
 
-const normilizeRules = (data: TRuleForm): TRule[] => {
+export const normilizeRules = (data: TRuleForm): TRule[] => {
   const rules: TRule[] = [];
 
   data.formData.forEach((rule) => {
@@ -40,5 +40,3 @@ const normilizeRules = (data: TRuleForm): TRule[] => {
   console.log(rules);
   return rules;
 };
-
-export default normilizeRules;

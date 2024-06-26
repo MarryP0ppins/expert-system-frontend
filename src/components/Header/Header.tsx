@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 
-import { classname } from '@/utils';
+import { classname } from '@/utils/classname';
 
 import Text, { TEXT_TAG, TEXT_VIEW, TEXT_WEIGHT } from '../Text';
 import { User } from '../User';
