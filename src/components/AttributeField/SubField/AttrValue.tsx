@@ -3,7 +3,7 @@ import { Control, useController } from 'react-hook-form';
 
 import ErrorPopup from '@/components/ErrorPopup';
 import TrashIcon from '@/icons/TrashIcon';
-import { TAttributeWithAttributeValues } from '@/types/attributes';
+import { TAttributeWithAttributeValuesForm } from '@/types/attributes';
 import { classname } from '@/utils';
 
 import Input from '../../Input';
@@ -14,9 +14,7 @@ type AttrValueProps = {
   isVisible?: boolean;
   attrIndex: number;
   attrValueIndex: number;
-  control: Control<{
-    formData: TAttributeWithAttributeValues[];
-  }>;
+  control: Control<TAttributeWithAttributeValuesForm>;
   onDeleteClick: () => void;
 };
 

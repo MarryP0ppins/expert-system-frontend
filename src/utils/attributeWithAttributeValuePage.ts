@@ -1,19 +1,18 @@
 import { TResponseAwaitedAttributePageMutate } from '@/types/attributePage';
-import { TAttributeWithAttributeValues } from '@/types/attributes';
+import { TAttributeWithAttributeValues, TAttributeWithAttributeValuesForm } from '@/types/attributes';
 import { TAttributeValue } from '@/types/attributeValues';
 
-const normilizeAttributeWithAttributevalue = (
-  data: TAttributeWithAttributeValues[],
+export const normilizeAttributeWithAttributevalue = (
+  data: TAttributeWithAttributeValuesForm,
   responsesData: TResponseAwaitedAttributePageMutate,
-  toDelete: { attributes: number[]; attrValues: number[] },
-): { formData: TAttributeWithAttributeValues[] } => {
+): TAttributeWithAttributeValues[] => {
   const attributeWithAttributevalue: TAttributeWithAttributeValues[] = [];
 
-  data.forEach((attribute) => {
-    if (toDelete.attributes.includes(attribute.id) || attribute.id === -1) {
+  data.formData.forEach((attribute) => {
+    if (attribute.deleted || attribute.id === -1) {
       return;
     }
-    const newAttribute = attribute;
+    const newAttribute: TAttributeWithAttributeValues = attribute;
     const changedAttribute = responsesData.updateAttributes?.find(
       (changedattribute) => changedattribute.id === attribute.id,
     );
@@ -23,7 +22,7 @@ const normilizeAttributeWithAttributevalue = (
 
     const newAttributeValues: TAttributeValue[] = [];
     attribute.values.forEach((attributeValue) => {
-      if (toDelete.attrValues.includes(attributeValue.id) || attributeValue.id === -1) {
+      if (attributeValue.deleted || attributeValue.id === -1) {
         return;
       }
       const newAttributeValue = attributeValue;
@@ -44,7 +43,15 @@ const normilizeAttributeWithAttributevalue = (
 
   const result = attributeWithAttributevalue.concat(responsesData.createAttributesWithValues ?? []);
 
-  return { formData: result };
+  return result;
 };
 
-export default normilizeAttributeWithAttributevalue;
+export const normilizeResponseDataAttributeWithAttributevalue = (
+  data: TAttributeWithAttributeValues[],
+): TAttributeWithAttributeValuesForm => ({
+  formData: data.map((attribute) => ({
+    ...attribute,
+    deleted: false,
+    values: attribute.values.map((values) => ({ ...values, deleted: false })),
+  })),
+});

@@ -9,3 +9,5 @@ export const attributeValueValidation = z.object({
 export const attributeValueUpdateValidation = attributeValueValidation.omit({ attribute_id: true });
 
 export const attributeValueNewValidation = attributeValueValidation.omit({ id: true });
+
+export const attributeValueForFormValidation = attributeValueValidation.extend({ deleted: z.boolean().default(false) });

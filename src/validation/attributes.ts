@@ -1,6 +1,6 @@
 import { number, z } from 'zod';
 
-import { attributeValueValidation } from './attributeValues';
+import { attributeValueForFormValidation, attributeValueValidation } from './attributeValues';
 
 export const attributeValidation = z.object({
   id: z.number(),
@@ -19,3 +19,14 @@ export const attributeWithAttributeValuesNewValidation = attributeValidation.omi
 export const formAttrWithValuesValidation = z.object({ formData: z.array(attributeWithAttributeValuesValidation) });
 
 export const attributeUpdateValidation = attributeValidation.omit({ system_id: true });
+
+export const attributeWithAttributeValuesForFormValidation = attributeValidation
+  .extend({
+    deleted: z.boolean(),
+    values: z.array(attributeValueForFormValidation),
+  })
+  .refine((attribute) => (!attribute.deleted ? attribute.values.some((attrValues) => !attrValues.deleted) : true));
+
+export const formAttributeWithAttributeValuesValidation = z.object({
+  formData: z.array(attributeWithAttributeValuesForFormValidation),
+});

@@ -1,8 +1,8 @@
 'use client';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 
 import {
@@ -19,11 +19,21 @@ import Loader from '@/components/Loader';
 import { ATTRIBUTES } from '@/constants';
 import AddIcon from '@/icons/AddIcon';
 import { TResponseAttributePageMutate } from '@/types/attributePage';
-import { TAttributeUpdate, TAttributeWithAttributeValues, TAttributeWithAttributeValuesNew } from '@/types/attributes';
+import {
+  TAttributeUpdate,
+  TAttributeWithAttributeValues,
+  TAttributeWithAttributeValuesForForm,
+  TAttributeWithAttributeValuesForm,
+  TAttributeWithAttributeValuesNew,
+} from '@/types/attributes';
 import { TAttributeValueNew, TAttributeValueUpdate } from '@/types/attributeValues';
-import { classname, objectPromiseAll } from '@/utils';
-import normilizeAttributeWithAttributevalue from '@/utils/normilizeAttributeWithAttributevalue';
-import { formAttrWithValuesValidation } from '@/validation/attributes';
+import {
+  classname,
+  normilizeAttributeWithAttributevalue,
+  normilizeResponseDataAttributeWithAttributevalue,
+  objectPromiseAll,
+} from '@/utils';
+import { formAttributeWithAttributeValuesValidation } from '@/validation/attributes';
 
 import classes from './page.module.scss';
 
@@ -34,13 +44,13 @@ type PageProps = {
 };
 
 const Page: React.FC<PageProps> = ({ params }) => {
-  const [toDelete, setToDelete] = useState({ attributes: [] as number[], attrValues: [] as number[] });
-
+  const queryClient = useQueryClient();
   const system_id = useMemo(() => Number(params.system_id), [params]);
 
   const { data, isLoading } = useSuspenseQuery({
     queryKey: [ATTRIBUTES.GET, { system: system_id }],
     queryFn: () => getAttributesWithValues(system_id),
+    select: (data) => normilizeResponseDataAttributeWithAttributevalue(data),
   });
 
   const {
@@ -49,43 +59,54 @@ const Page: React.FC<PageProps> = ({ params }) => {
     reset,
     getValues,
     formState: { isValid, dirtyFields },
-  } = useForm<{ formData: TAttributeWithAttributeValues[] }>({
-    resolver: zodResolver(formAttrWithValuesValidation),
-    defaultValues: { formData: data },
+  } = useForm<TAttributeWithAttributeValuesForm>({
+    resolver: zodResolver(formAttributeWithAttributeValuesValidation),
     mode: 'all',
   });
 
   const { mutate, isPending } = useMutation({
     mutationFn: (responseList: TResponseAttributePageMutate) => objectPromiseAll(responseList),
-    onSuccess: (data) => reset(normilizeAttributeWithAttributevalue(getValues('formData'), data, toDelete)),
-    onSettled: () => setToDelete({ attributes: [], attrValues: [] }),
+    onSuccess: (data) =>
+      queryClient.setQueryData<TAttributeWithAttributeValues[]>(
+        [ATTRIBUTES.GET, { system: system_id }],
+        normilizeAttributeWithAttributevalue(getValues(), data),
+      ),
   });
 
-  const { fields, append, remove } = useFieldArray({ control, name: 'formData', keyName: 'arrayId' });
+  const { fields, append, remove, update } = useFieldArray({ control, name: 'formData', keyName: 'arrayId' });
 
   const isFormDirty = useCallback(() => {
-    const isDirtyForm = dirtyFields.formData?.some((attribute) => {
-      if (attribute.id || attribute.name || attribute.system_id) {
+    const currentValues = getValues();
+    const isDirtyForm = dirtyFields.formData?.some((attribute, attributeIndex) => {
+      const currentAttribute = currentValues.formData[attributeIndex];
+      if (attribute.id || attribute.name || attribute.system_id || currentAttribute.deleted) {
         return true;
       }
-      return attribute.values?.some((value) => Object.values(value).some((val) => val));
+      return attribute.values?.some(
+        (value, valueIndex) => Object.values(value).some((val) => val) || currentAttribute.values[valueIndex].deleted,
+      );
     });
 
-    return isDirtyForm || !!toDelete.attrValues.length || !!toDelete.attributes.length;
-  }, [dirtyFields, toDelete.attrValues.length, toDelete.attributes.length]);
+    return isDirtyForm;
+  }, [dirtyFields.formData, getValues]);
 
   const handleFormSubmit = useCallback(
-    (form: { formData: TAttributeWithAttributeValues[] }) => {
+    (form: TAttributeWithAttributeValuesForm) => {
       const attrUpdate: TAttributeUpdate[] = [];
       const attrValueUpdate: TAttributeValueUpdate[] = [];
       const attrNew: TAttributeWithAttributeValuesNew[] = [];
       const attrValueNew: TAttributeValueNew[] = [];
+      const atttributeDelete: number[] = [];
       const attrValueDelete: number[] = [];
 
       form.formData.forEach((attribute, attrIndex) => {
+        if (attribute.deleted) {
+          atttributeDelete.push(attribute.id);
+          return;
+        }
         const newValuesNewAttribute: string[] = [];
         attribute.values.forEach((attrValue, attrValueIndex) => {
-          if (!toDelete.attrValues.includes(attrValue.id)) {
+          if (!attrValue.deleted) {
             if (attrValue.id === -1) {
               if (attrValue.attribute_id === -1) {
                 newValuesNewAttribute.push(attrValue.value);
@@ -99,17 +120,16 @@ const Page: React.FC<PageProps> = ({ params }) => {
             ) {
               attrValueUpdate.push({ id: attrValue.id, value: attrValue.value });
             }
-          } else if (!toDelete.attributes.includes(attribute.id)) {
+          } else if (!attribute.deleted) {
             attrValueDelete.push(attrValue.id);
           }
         });
-        if (!toDelete.attributes.includes(attribute.id)) {
-          if (attribute.id === -1) {
-            attrNew.push({ system_id: attribute.system_id, name: attribute.name, values_name: newValuesNewAttribute });
-          }
-          if (!dirtyFields.formData?.[attrIndex]?.id && dirtyFields.formData?.[attrIndex]?.name) {
-            attrUpdate.push({ id: attribute.id, name: attribute.name });
-          }
+
+        if (attribute.id === -1) {
+          attrNew.push({ system_id: attribute.system_id, name: attribute.name, values_name: newValuesNewAttribute });
+        }
+        if (!dirtyFields.formData?.[attrIndex]?.id && dirtyFields.formData?.[attrIndex]?.name) {
+          attrUpdate.push({ id: attribute.id, name: attribute.name });
         }
       });
 
@@ -126,8 +146,8 @@ const Page: React.FC<PageProps> = ({ params }) => {
       if (attrValueUpdate.length) {
         responses.updateAttributesValues = updateAttributesValues(attrValueUpdate);
       }
-      if (toDelete.attributes.length) {
-        responses.deleteAttributes = deleteAttributes(toDelete.attributes);
+      if (atttributeDelete.length) {
+        responses.deleteAttributes = deleteAttributes(atttributeDelete);
       }
       if (attrValueDelete.length) {
         responses.deleteAttributesValues = deleteAttributesValues(attrValueDelete);
@@ -135,29 +155,24 @@ const Page: React.FC<PageProps> = ({ params }) => {
 
       mutate(responses);
     },
-    [dirtyFields, mutate, toDelete],
+    [dirtyFields, mutate],
   );
   const handleAddAttr = useCallback(
-    () => append({ id: -1, system_id: system_id, name: '', values: [] }),
+    () => append({ id: -1, system_id: system_id, name: '', values: [], deleted: false }),
     [append, system_id],
   );
   const handleDeleteAttr = useCallback(
-    (attrId: number, attrIndex: number) => () => {
-      if (attrId === -1) {
+    (attr: TAttributeWithAttributeValuesForForm, attrIndex: number) => () => {
+      if (attr.id === -1) {
         remove(attrIndex);
       } else {
-        setToDelete((prev) => ({ attributes: prev.attributes.concat(attrId), attrValues: prev.attrValues }));
+        update(attrIndex, { ...attr, deleted: true });
       }
     },
-    [remove],
-  );
-  const handleDeleteAttrValue = useCallback(
-    (attrValueId: number) =>
-      setToDelete((prev) => ({ attributes: prev.attributes, attrValues: prev.attrValues.concat(attrValueId) })),
-    [],
+    [remove, update],
   );
 
-  useEffect(() => reset({ formData: data }), [data, reset]);
+  useEffect(() => reset(data), [data, reset]);
 
   return (
     <main className={cnAttributes()}>
@@ -165,13 +180,11 @@ const Page: React.FC<PageProps> = ({ params }) => {
         {fields.map((attribute, attrIndex) => (
           <AttributeField
             key={attribute.arrayId}
-            isVisible={!toDelete.attributes.includes(attribute.id)}
+            isVisible={!attribute.deleted}
             attributeId={attribute.id}
             control={control}
             index={attrIndex}
-            onDelete={handleDeleteAttr(attribute.id, attrIndex)}
-            onAttributeValueDelete={handleDeleteAttrValue}
-            deletedSubFieldIds={toDelete.attrValues}
+            onDelete={handleDeleteAttr(attribute, attrIndex)}
           />
         ))}
         <div className={cnAttributes('newAttr')}>

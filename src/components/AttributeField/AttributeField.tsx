@@ -3,7 +3,8 @@ import { Control, useController, useFieldArray } from 'react-hook-form';
 
 import AddIcon from '@/icons/AddIcon';
 import CloseIcon from '@/icons/CloseIcon';
-import { TAttributeWithAttributeValues } from '@/types/attributes';
+import { TAttributeWithAttributeValuesForm } from '@/types/attributes';
+import { TAttributeValueForForm } from '@/types/attributeValues';
 import { classname } from '@/utils';
 
 import ErrorPopup from '../ErrorPopup';
@@ -17,43 +18,35 @@ type AttributeFieldProps = {
   isVisible?: boolean;
   attributeId: number;
   index: number;
-  control: Control<{
-    formData: TAttributeWithAttributeValues[];
-  }>;
+  control: Control<TAttributeWithAttributeValuesForm>;
   onDelete: () => void;
-  onAttributeValueDelete: (attrValueId: number) => void;
-  deletedSubFieldIds: number[];
 };
 
 const cnFields = classname(classes, 'fieldWithFields');
 
-const AttributeField: React.FC<AttributeFieldProps> = ({
-  isVisible = true,
-  control,
-  index,
-  attributeId,
-  onDelete,
-  onAttributeValueDelete,
-  deletedSubFieldIds,
-}) => {
+const AttributeField: React.FC<AttributeFieldProps> = ({ isVisible = true, control, index, attributeId, onDelete }) => {
   const {
     field,
     fieldState: { error },
   } = useController({ control, name: `formData.${index}.name` });
-  const { fields, append, remove } = useFieldArray({ control, name: `formData.${index}.values`, keyName: 'arrayId' });
+  const { fields, append, remove, update } = useFieldArray({
+    control,
+    name: `formData.${index}.values`,
+    keyName: 'arrayId',
+  });
 
   const handleDeleteAttrValue = useCallback(
-    (attrValueId: number, attrValueIndex: number) => () => {
-      if (attrValueId === -1) {
+    (attrValue: TAttributeValueForForm, attrValueIndex: number) => () => {
+      if (attrValue.id === -1) {
         remove(attrValueIndex);
       } else {
-        onAttributeValueDelete(attrValueId);
+        update(attrValueIndex, { ...attrValue, deleted: true });
       }
     },
-    [onAttributeValueDelete, remove],
+    [remove, update],
   );
   const handleAddAttrValue = useCallback(
-    () => append({ id: -1, attribute_id: attributeId, value: '' }),
+    () => append({ id: -1, attribute_id: attributeId, value: '', deleted: false }),
     [append, attributeId],
   );
 
@@ -76,11 +69,11 @@ const AttributeField: React.FC<AttributeFieldProps> = ({
         {fields.map((attrValue, attrValueIndex) => (
           <AttrValue
             key={attrValue.arrayId}
-            isVisible={!deletedSubFieldIds.includes(attrValue.id)}
+            isVisible={!attrValue.deleted}
             control={control}
             attrIndex={index}
             attrValueIndex={attrValueIndex}
-            onDeleteClick={handleDeleteAttrValue(attrValue.id, attrValueIndex)}
+            onDeleteClick={handleDeleteAttrValue(attrValue, attrValueIndex)}
           />
         ))}
         <div className={cnFields('newValue')} key="new-attrValue">
