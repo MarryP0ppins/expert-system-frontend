@@ -1,5 +1,5 @@
 'use client';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
@@ -61,16 +61,17 @@ const Page: React.FC<PageProps> = ({ params }) => {
     formState: { isValid, dirtyFields },
   } = useForm<TAttributeWithAttributeValuesForm>({
     resolver: zodResolver(formAttributeWithAttributeValuesValidation),
+    defaultValues: data,
     mode: 'all',
   });
 
   const { mutate, isPending } = useMutation({
     mutationFn: (responseList: TResponseAttributePageMutate) => objectPromiseAll(responseList),
-    onSuccess: (data) =>
-      queryClient.setQueryData<TAttributeWithAttributeValues[]>(
-        [ATTRIBUTES.GET, { system: system_id }],
-        normilizeAttributeWithAttributevalue(getValues(), data),
-      ),
+    onSuccess: (data) => {
+      const newData = normilizeAttributeWithAttributevalue(getValues(), data);
+      reset(normilizeResponseDataAttributeWithAttributevalue(newData));
+      queryClient.setQueryData<TAttributeWithAttributeValues[]>([ATTRIBUTES.GET, { system: system_id }], newData);
+    },
   });
 
   const { fields, append, remove, update } = useFieldArray({ control, name: 'formData', keyName: 'arrayId' });
@@ -171,8 +172,6 @@ const Page: React.FC<PageProps> = ({ params }) => {
     },
     [remove, update],
   );
-
-  useEffect(() => reset(data), [data, reset]);
 
   return (
     <main className={cnAttributes()}>
