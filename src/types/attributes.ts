@@ -5,6 +5,7 @@ import {
   attributeWithAttributeValuesForFormValidation,
   attributeWithAttributeValuesNewValidation,
   attributeWithAttributeValuesValidation,
+  attributeWithAttrValueForObjectsValidation,
   formAttributeWithAttributeValuesValidation,
 } from '@/validation/attributes';
 
@@ -17,3 +18,5 @@ export type TAttributeUpdate = z.infer<typeof attributeUpdateValidation>;
 export type TAttributeWithAttributeValuesForForm = z.infer<typeof attributeWithAttributeValuesForFormValidation>;
 
 export type TAttributeWithAttributeValuesForm = z.infer<typeof formAttributeWithAttributeValuesValidation>;
+
+export type TAttributeWithAttrValueForObjects = z.infer<typeof attributeWithAttrValueForObjectsValidation>;

@@ -3,7 +3,7 @@ import { Control, useFieldArray } from 'react-hook-form';
 
 import CheckBox from '@/components/CheckBox';
 import { ArrowDownIcon } from '@/icons';
-import { TAttributeValue } from '@/types/attributeValues';
+import { TAttributeValWithActiveNewDelete } from '@/types/attributeValues';
 import { TObjectWithAttrValuesForm } from '@/types/objects';
 import { classname } from '@/utils/classname';
 
@@ -17,8 +17,7 @@ export type ObjectMultiDropdownProps = {
   className?: string;
   control: Control<TObjectWithAttrValuesForm>;
   objectIndex: number;
-  attrValues: TAttributeValue[];
-  attributeId: number;
+  attributeIndex: number;
   attributeName: string;
 };
 
@@ -27,16 +26,15 @@ const cnObjectMultiDropdown = classname(classes, 'multidropdown');
 const ObjectMultiDropdown: React.FC<ObjectMultiDropdownProps> = ({
   className,
   objectIndex,
+  attributeIndex,
   control,
-  attrValues,
-  attributeId,
   attributeName,
 }) => {
   const [popoverVisible, setPopoverVisible] = useState(false);
 
-  const { fields, remove, append } = useFieldArray({
+  const { fields: attributeValuesFields, update } = useFieldArray({
     control,
-    name: `formData.${objectIndex}.attributesValues`,
+    name: `formData.${objectIndex}.attributes.${attributeIndex}.values`,
     keyName: 'arrayId',
   });
 
@@ -52,32 +50,35 @@ const ObjectMultiDropdown: React.FC<ObjectMultiDropdownProps> = ({
 
   useClickOutside(dropdownRef, handleOnClickOutside);
 
-  const attributeValues = useMemo(
-    () => fields.filter((field) => field.attribute_id === attributeId),
-    [attributeId, fields],
-  );
-
-  const inputValue = useMemo(() => attributeValues.map((val) => val.value).join('; '), [attributeValues]);
-
-  const choosenValues = useMemo(() => attributeValues.map((val) => val.id), [attributeValues]);
+  const inputValue = useMemo(() => {
+    return attributeValuesFields.reduce((line, value) => {
+      if (value.isActive) {
+        if (line.length !== 0) {
+          line += '; ';
+        }
+        line += value.value;
+      }
+      return line;
+    }, '');
+  }, [attributeValuesFields]);
 
   const onValueClick = useCallback(
-    (attrValue: TAttributeValue) => () => {
-      if (choosenValues.includes(attrValue.id)) {
-        const attrValueIndex = fields.findIndex((value) => value.id === attrValue.id);
-        remove(attrValueIndex);
-      } else {
-        append(attrValue);
-      }
+    (attrValue: TAttributeValWithActiveNewDelete, attrValueIndex: number) => () => {
+      update(attrValueIndex, {
+        ...attrValue,
+        isActive: !attrValue.isActive,
+        added: !attrValue.isActive && !attrValue.deleted,
+        deleted: attrValue.isActive && !attrValue.added,
+      });
     },
-    [append, choosenValues, fields, remove],
+    [update],
   );
 
   return (
     <div className={cnObjectMultiDropdown() + ` ${className}`} ref={dropdownRef}>
       <Input
-        defaultValue={inputValue}
-        viewOnly
+        value={inputValue}
+        readOnly
         afterSlot={
           <ArrowDownIcon
             onClick={handleOnClickInput}
@@ -92,19 +93,19 @@ const ObjectMultiDropdown: React.FC<ObjectMultiDropdownProps> = ({
       />
       {popoverVisible && (
         <div className={cnObjectMultiDropdown('options')}>
-          {attrValues.map((attrValue) => (
+          {attributeValuesFields.map((attrValue, attrValueIndex) => (
             <div
-              key={attrValue.id}
-              onClick={onValueClick(attrValue)}
+              key={attrValue.arrayId}
+              onClick={onValueClick(attrValue, attrValueIndex)}
               className={cnObjectMultiDropdown('raw')}
               title={attrValue.value}
             >
-              <CheckBox checked={choosenValues.includes(attrValue.id)} />
+              <CheckBox checked={attrValue.isActive} readOnly />
               <Text
                 tag={TEXT_TAG.div}
                 view={TEXT_VIEW.p16}
                 className={cnObjectMultiDropdown('option')}
-                color={choosenValues.includes(attrValue.id) ? 'accent' : 'primary'}
+                color={attrValue.isActive ? 'accent' : 'primary'}
               >
                 {attrValue.value}
               </Text>

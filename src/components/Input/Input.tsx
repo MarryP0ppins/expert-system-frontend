@@ -12,13 +12,12 @@ export type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   error?: boolean;
   label?: string;
   labelTitle?: string;
-  viewOnly?: boolean;
 };
 
 const cnInput = classname(classes, 'input');
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ afterSlot, className, type = 'text', error, label, labelTitle, viewOnly, ...props }, ref) => {
+  ({ afterSlot, className, type = 'text', error, label, labelTitle, readOnly, ...props }, ref) => {
     return (
       <Text
         tag={TEXT_TAG.div}
@@ -28,7 +27,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         <div className={cnInput('label', { visible: !!label })} title={labelTitle}>
           {label}
         </div>
-        <input {...props} ref={ref} type={type} className={cnInput({ viewOnly })} />
+        <input {...props} ref={ref} type={type} readOnly={readOnly} className={cnInput({ readOnly })} />
         {afterSlot}
       </Text>
     );

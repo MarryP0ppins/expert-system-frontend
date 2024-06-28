@@ -11,3 +11,10 @@ export const attributeValueUpdateValidation = attributeValueValidation.omit({ at
 export const attributeValueNewValidation = attributeValueValidation.omit({ id: true });
 
 export const attributeValueForFormValidation = attributeValueValidation.extend({ deleted: z.boolean().default(false) });
+
+export const attributeValWithActiveNewdeleteValidation = attributeValueValidation.extend({
+  isActive: z.boolean(),
+  added: z.boolean(),
+  deleted: z.boolean(),
+  idsId: z.number(),
+});

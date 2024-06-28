@@ -22,8 +22,8 @@ export const updateObjects = async (objects: TObjectUpdate[]): Promise<TObjectWi
   return data;
 };
 
-export const deleteObjects = async (objectsIds: number[]) => {
-  const result = await deleteApiRequest(`/objects/multiple_delete`, objectsIds);
+export const deleteObjects = async (objectsIds: number[]): Promise<number> => {
+  const result = await deleteApiRequest<number, number[]>(`/objects/multiple_delete`, objectsIds);
 
   return result;
 };

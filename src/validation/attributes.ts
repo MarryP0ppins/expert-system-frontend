@@ -1,6 +1,10 @@
 import { number, z } from 'zod';
 
-import { attributeValueForFormValidation, attributeValueValidation } from './attributeValues';
+import {
+  attributeValueForFormValidation,
+  attributeValueValidation,
+  attributeValWithActiveNewdeleteValidation,
+} from './attributeValues';
 
 export const attributeValidation = z.object({
   id: z.number(),
@@ -29,4 +33,8 @@ export const attributeWithAttributeValuesForFormValidation = attributeValidation
 
 export const formAttributeWithAttributeValuesValidation = z.object({
   formData: z.array(attributeWithAttributeValuesForFormValidation),
+});
+
+export const attributeWithAttrValueForObjectsValidation = attributeValidation.extend({
+  values: z.array(attributeValWithActiveNewdeleteValidation),
 });

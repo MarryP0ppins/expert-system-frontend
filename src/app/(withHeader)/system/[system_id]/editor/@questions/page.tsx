@@ -65,9 +65,9 @@ const Page: React.FC<PageProps> = ({ params }) => {
   const { fields, append, remove, update } = useFieldArray({ control, name: 'formData', keyName: 'arrayId' });
 
   const isFormDirty = useCallback(() => {
-    const currentValues = getValues();
+    const currentValues = getValues('formData');
     const isDirtyForm = dirtyFields.formData?.some((question, questionIndex) => {
-      const currentQuestion = currentValues.formData[questionIndex];
+      const currentQuestion = currentValues[questionIndex];
       if (question.id || question.body || question.system_id || question.with_chooses || currentQuestion.deleted) {
         return true;
       }

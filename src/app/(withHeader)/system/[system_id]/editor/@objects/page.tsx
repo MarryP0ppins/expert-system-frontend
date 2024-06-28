@@ -1,8 +1,8 @@
 'use client';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useSuspenseQueries } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 
 import { getAttributesWithValues } from '@/api/services/attributes';
@@ -22,9 +22,12 @@ import Loader from '@/components/Loader';
 import ObjectField from '@/components/ObjectField';
 import { ATTRIBUTES, OBJECTS } from '@/constants';
 import AddIcon from '@/icons/AddIcon';
+import { TAttributeWithAttributeValues, TAttributeWithAttrValueForObjects } from '@/types/attributes';
 import { TObjectAttributeAttributeValueNew } from '@/types/objectAttributeAttributeValue';
+import { TResponseObjectPageMutate } from '@/types/objectPage';
 import { TObjectUpdate, TObjectWithAttrValues, TObjectWithAttrValuesForm, TObjectWithIdsNew } from '@/types/objects';
 import { classname } from '@/utils/classname';
+import { objectPromiseAll } from '@/utils/objectPromiseAll';
 import { formObjectWithAttrValuesValidation } from '@/validation/objects';
 
 import classes from './page.module.scss';
@@ -38,176 +41,204 @@ type PageProps = {
 const Page: React.FC<PageProps> = ({ params }) => {
   const queryClient = useQueryClient();
 
-  const [toDelete, setToDelete] = useState<number[]>([]);
-
   const system_id = useMemo(() => Number(params.system_id) ?? -1, [params]);
 
-  const { data: objectsData, isLoading: objectsIsLoading } = useSuspenseQuery({
-    queryKey: [OBJECTS.GET, { system: system_id }],
-    queryFn: () => getObjectsWithAttrValues(system_id),
-  });
+  const [objectsWithAttrValuesQueryResult, attributeQueryResult] = useSuspenseQueries({
+    queries: [
+      {
+        queryKey: [OBJECTS.GET, { system: system_id }],
+        queryFn: () => getObjectsWithAttrValues(system_id),
+      },
+      {
+        queryKey: [ATTRIBUTES.GET, { system: system_id }],
+        queryFn: () => getAttributesWithValues(system_id),
+        select: (data: TAttributeWithAttributeValues[]): TAttributeWithAttrValueForObjects[] =>
+          data.map((attribute) => ({
+            ...attribute,
+            values: attribute.values.map((attrValue) => ({
+              ...attrValue,
+              isActive: false,
+              added: false,
+              deleted: false,
+              idsId: -1,
+            })),
+          })),
+      },
+    ],
+    combine: ([objectsQueryResult, attributeQueryResult]) => {
+      const result: TObjectWithAttrValues[] = [];
+      objectsQueryResult.data.forEach((object) => {
+        const attrValMap = new Map(
+          object.object_attribute_attributevalue_ids.map((ids) => [ids.attribute_value_id, ids.id]),
+        );
 
-  const { data: attributesData, isLoading: attributesIsLoading } = useSuspenseQuery({
-    queryKey: [ATTRIBUTES.GET, { system: system_id }],
-    queryFn: () => getAttributesWithValues(system_id),
-  });
-
-  const isLoading = useMemo(() => objectsIsLoading || attributesIsLoading, [attributesIsLoading, objectsIsLoading]);
-
-  const pageData = useMemo<TObjectWithAttrValuesForm>(() => {
-    const res: TObjectWithAttrValuesForm = { formData: [] };
-    objectsData.forEach((object) => {
-      const newObject: TObjectWithAttrValues = {
-        id: object.id,
-        system_id: object.system_id,
-        name: object.name,
-        attributesValues: [],
-      };
-      object.object_attribute_attributevalue_ids.forEach((ids) => {
-        const attribute = attributesData.find((attribute) => attribute.id === ids.attribute_id);
-        const attributeValue = attribute?.values.find((value) => value.id === ids.attribute_value_id);
-        if (!!attribute && !!attributeValue) {
-          newObject.attributesValues = newObject.attributesValues.concat(attributeValue);
-        }
+        result.push({
+          ...object,
+          deleted: false,
+          attributes: attributeQueryResult.data.map((attribute) => ({
+            ...attribute,
+            values: attribute.values.map((attrValues) => {
+              const ids = attrValMap.get(attrValues.id);
+              return {
+                ...attrValues,
+                isActive: !!ids,
+                idsId: ids ?? -1,
+              };
+            }),
+          })),
+        });
       });
-      res.formData.push(newObject);
-    });
-    return res;
-  }, [attributesData, objectsData]);
+      return [
+        { data: { formData: result }, isLoading: objectsQueryResult.isLoading || attributeQueryResult.isLoading },
+        { data: attributeQueryResult.data, isLoading: attributeQueryResult.isLoading },
+      ];
+    },
+  });
+
+  const { attributesData, attributesIsLoading } = useMemo(
+    () => ({ attributesData: attributeQueryResult.data, attributesIsLoading: attributeQueryResult.isLoading }),
+    [attributeQueryResult],
+  );
+  const { objectsWithAttrValuesData, objectsWithAttrValuesIsLoading } = useMemo(
+    () => ({
+      objectsWithAttrValuesData: objectsWithAttrValuesQueryResult.data,
+      objectsWithAttrValuesIsLoading: objectsWithAttrValuesQueryResult.isLoading,
+    }),
+    [objectsWithAttrValuesQueryResult],
+  );
+
+  const isLoading = useMemo(
+    () => objectsWithAttrValuesIsLoading || attributesIsLoading,
+    [attributesIsLoading, objectsWithAttrValuesIsLoading],
+  );
 
   const {
     control,
     handleSubmit,
-    reset,
+    getValues,
     formState: { dirtyFields, isValid },
   } = useForm<TObjectWithAttrValuesForm>({
-    defaultValues: pageData,
+    defaultValues: objectsWithAttrValuesData,
     resolver: zodResolver(formObjectWithAttrValuesValidation),
     mode: 'all',
   });
   const { mutate, isPending } = useMutation({
-    mutationFn: (responseList: Promise<unknown>[]) => Promise.allSettled(responseList),
+    mutationFn: (responseList: TResponseObjectPageMutate) => objectPromiseAll(responseList),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: [OBJECTS.GET, { system: system_id }] }),
-    onSettled: () => setToDelete([]),
   });
 
-  const { fields, append, remove } = useFieldArray({ control, name: 'formData', keyName: 'arrayId' });
+  const { fields, append, remove, update } = useFieldArray({ control, name: 'formData', keyName: 'arrayId' });
 
   const isFormDirty = useCallback(() => {
-    const isDirtyForm = dirtyFields.formData?.some((object) => {
-      if (object.id || object.name || object.system_id) {
+    const currentValues = getValues('formData');
+    const isDirtyForm = dirtyFields.formData?.some((object, objectIndex) => {
+      if (object.id || object.name || object.system_id || currentValues[objectIndex].deleted) {
         return true;
       }
 
-      return object.attributesValues?.some((attrValue) => Object.values(attrValue).some((val) => val));
+      return object.attributes?.some((attr) => attr.values?.some((attrValue) => attrValue.added || attrValue.deleted));
     });
 
-    return isDirtyForm || !!toDelete.length;
-  }, [dirtyFields, toDelete]);
+    return isDirtyForm;
+  }, [dirtyFields.formData, getValues]);
 
   const handleFormSubmit = useCallback(
     (form: TObjectWithAttrValuesForm) => {
       const objectNew: TObjectWithIdsNew[] = [];
       const objectUpdate: TObjectUpdate[] = [];
       const idsNew: TObjectAttributeAttributeValueNew[] = [];
+      const objectDelete: number[] = [];
       const idsDelete: number[] = [];
 
       form.formData.forEach((object, objectIndex) => {
-        if (!toDelete.includes(object.id)) {
-          const oldObject = pageData.formData.find((obj) => obj.id === object.id);
-          const newAttribute = object.attributesValues.filter(
-            (x) => !oldObject?.attributesValues.some((y) => x.id === y.id),
-          );
+        if (object.deleted) {
+          objectDelete.push(object.id);
+          return;
+        }
+        const newIds: TObjectAttributeAttributeValueNew[] = [];
 
-          const newIds: Omit<TObjectAttributeAttributeValueNew, 'object_id'>[] = [];
-          newAttribute.forEach((val) => {
-            if (object.id === -1) {
-              newIds.push({ attribute_id: val.attribute_id, attribute_value_id: val.id });
-            } else {
-              idsNew.push({ object_id: object.id, attribute_id: val.attribute_id, attribute_value_id: val.id });
+        object.attributes.forEach((attribue) =>
+          attribue.values.forEach((attribueValue) => {
+            if (attribueValue.added) {
+              newIds.push({ object_id: object.id, attribute_id: attribue.id, attribute_value_id: attribueValue.id });
+              return;
             }
-          });
-
-          const deleteAttributeValues = oldObject?.attributesValues.filter(
-            (x) => !object.attributesValues.some((y) => x.id === y.id),
-          );
-
-          deleteAttributeValues?.forEach((attrValue) => {
-            const idsId = objectsData
-              .find((obj) => obj.id === object.id)
-              ?.object_attribute_attributevalue_ids.find(
-                (ids) => ids.attribute_value_id === attrValue.id && ids.attribute_id === attrValue.attribute_id,
-              )?.id;
-            if (idsId) {
-              idsDelete.push(idsId);
+            if (attribueValue.deleted) {
+              idsDelete.push(attribueValue.idsId);
             }
+          }),
+        );
+        if (object.id === -1) {
+          objectNew.push({
+            system_id: object.system_id,
+            name: object.name,
+            object_attribute_attributevalue_ids: newIds,
           });
-          if (object.id === -1) {
-            objectNew.push({
-              system_id: object.system_id,
-              name: object.name,
-              object_attribute_attributevalue_ids: newIds,
-            });
-          }
+        } else {
+          idsNew.push(...newIds);
+        }
 
-          if (!dirtyFields.formData?.[objectIndex]?.id && dirtyFields.formData?.[objectIndex]?.name) {
-            objectUpdate.push({ id: object.id, name: object.name });
-          }
+        if (!dirtyFields.formData?.[objectIndex]?.id && dirtyFields.formData?.[objectIndex]?.name) {
+          objectUpdate.push({ id: object.id, name: object.name });
         }
       });
-      const responses = [];
+      const responses: TResponseObjectPageMutate = {};
 
       if (objectNew.length) {
-        responses.push(createObjectWithAttrValues(objectNew));
+        responses.createObjectWithAttrValues = createObjectWithAttrValues(objectNew);
       }
       if (objectUpdate.length) {
-        responses.push(updateObjects(objectUpdate));
+        responses.updateObjects = updateObjects(objectUpdate);
       }
       if (idsNew.length) {
-        responses.push(createObjectAttributeAttributeValue(idsNew));
+        responses.createObjectAttributeAttributeValue = createObjectAttributeAttributeValue(idsNew);
       }
       if (idsDelete.length) {
-        responses.push(deleteObjectAttributeAttributeValue(idsDelete));
+        responses.deleteObjectAttributeAttributeValue = deleteObjectAttributeAttributeValue(idsDelete);
       }
-      if (toDelete.length) {
-        responses.push(deleteObjects(toDelete));
+      if (objectDelete.length) {
+        responses.deleteObjects = deleteObjects(objectDelete);
       }
 
       mutate(responses);
     },
-    [dirtyFields.formData, mutate, objectsData, pageData.formData, toDelete],
+    [dirtyFields.formData, mutate],
   );
   const handleAddObject = useCallback(
-    () => append({ id: -1, system_id: system_id, name: '', attributesValues: [] }),
-    [append, system_id],
+    () => append({ id: -1, system_id: system_id, name: '', attributes: attributesData, deleted: false }),
+    [append, attributesData, system_id],
   );
   const handleDeleteObject = useCallback(
-    (objectId: number, objectIndex: number) => () => {
-      if (objectId === -1) {
+    (object: TObjectWithAttrValues, objectIndex: number) => () => {
+      if (object.id === -1) {
         remove(objectIndex);
       } else {
-        setToDelete((prev) => prev.concat(objectId));
+        update(objectIndex, { ...object, deleted: true });
       }
     },
-    [remove],
+    [remove, update],
   );
-
-  useEffect(() => reset(pageData), [pageData, reset]);
 
   return (
     <main className={cnObjects()}>
       <form onSubmit={handleSubmit(handleFormSubmit)} className={cnObjects('form')}>
-        {fields.map((object, objectIndex) => (
-          <ObjectField
-            key={object.arrayId}
-            isVisible={!toDelete.includes(object.id)}
-            objectId={object.id}
-            control={control}
-            objectIndex={objectIndex}
-            onDelete={handleDeleteObject(object.id, objectIndex)}
-            allAttributes={attributesData}
-          />
-        ))}
+        <div className={cnObjects('objectsList')}>
+          {fields.map((object, objectIndex) => (
+            <ObjectField
+              key={object.arrayId}
+              isVisible={!object.deleted}
+              objectId={object.id}
+              control={control}
+              objectIndex={objectIndex}
+              onDelete={handleDeleteObject(object, objectIndex)}
+            />
+          ))}
+          <div className={cnObjects('newObject')}>
+            <AddIcon width={30} height={30} className={cnObjects('newObject-addIcon')} onClick={handleAddObject} />
+            <Input className={cnObjects('newObject-input')} onClick={handleAddObject} placeholder="Новый обьект" />
+          </div>
+        </div>
+
         <div className={cnObjects('loadingScreen', { enabled: isLoading || isPending })} />
         <Button
           className={cnObjects('submitButton', { visible: isFormDirty() })}
@@ -217,10 +248,6 @@ const Page: React.FC<PageProps> = ({ params }) => {
           Сохранить
         </Button>
       </form>
-      <div className={cnObjects('newObject')}>
-        <AddIcon width={30} height={30} className={cnObjects('newObject-addIcon')} onClick={handleAddObject} />
-        <Input className={cnObjects('newObject-input')} onClick={handleAddObject} placeholder="Новый обьект" />
-      </div>
     </main>
   );
 };

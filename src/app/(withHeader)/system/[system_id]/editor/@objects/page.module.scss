@@ -7,29 +7,36 @@
   width: 100%;
 
   &-form {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    gap: 24px;
+    width: 100%;
+    position: relative;
+    padding: 0 16px;
+    padding-top: 20px;
+    margin-bottom: 76px;
+  }
+
+  &-objectsList {
     display: grid;
     grid-template-columns: repeat(auto-fit, 600px);
     justify-content: space-evenly;
     gap: 24px;
     width: 100%;
-
-    margin-bottom: 24px;
-    position: relative;
-    padding: 0 16px;
-    padding-top: 20px;
   }
 
   &-newObject {
     display: flex;
     flex-direction: row;
     align-items: center;
+    height: min-content;
     gap: $space-s;
     border: 1px solid $border-color;
     border-radius: $border-radius;
     padding: 14px;
     max-width: 1000px;
     width: 100%;
-    margin-bottom: 76px;
 
     &-input {
       width: 100%;

@@ -1,8 +1,7 @@
 import React from 'react';
-import { Control, useController } from 'react-hook-form';
+import { Control, useController, useFieldArray } from 'react-hook-form';
 
 import CloseIcon from '@/icons/CloseIcon';
-import { TAttributeWithAttributeValues } from '@/types/attributes';
 import { TObjectWithAttrValuesForm } from '@/types/objects';
 import { classname } from '@/utils/classname';
 
@@ -18,17 +17,22 @@ type ObjectFieldProps = {
   objectId: number;
   objectIndex: number;
   control: Control<TObjectWithAttrValuesForm>;
-  allAttributes: TAttributeWithAttributeValues[];
   onDelete: () => void;
 };
 
 const cnFields = classname(classes, 'fieldWithFields');
 
-const ObjectField: React.FC<ObjectFieldProps> = ({ isVisible, control, objectIndex, onDelete, allAttributes }) => {
+const ObjectField: React.FC<ObjectFieldProps> = ({ isVisible, control, objectIndex, onDelete }) => {
   const {
     field: bodyField,
     fieldState: { error: bodyError },
   } = useController({ control, name: `formData.${objectIndex}.name` });
+
+  const { fields: attributeFields } = useFieldArray({
+    control,
+    name: `formData.${objectIndex}.attributes`,
+    keyName: 'arrayId',
+  });
 
   if (!isVisible) {
     return null;
@@ -47,14 +51,13 @@ const ObjectField: React.FC<ObjectFieldProps> = ({ isVisible, control, objectInd
       />
       <div className={cnFields('line')} />
       <div className={cnFields('attributes')}>
-        {allAttributes.map((attribute) => (
+        {attributeFields.map((attribute, attributeIndex) => (
           <ObjectMultiDropdown
-            key={attribute.id}
-            attributeId={attribute.id}
+            key={attribute.arrayId}
             attributeName={attribute.name}
             objectIndex={objectIndex}
+            attributeIndex={attributeIndex}
             control={control}
-            attrValues={attribute.values}
           />
         ))}
       </div>

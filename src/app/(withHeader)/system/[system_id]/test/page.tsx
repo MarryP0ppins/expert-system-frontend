@@ -188,7 +188,7 @@ const Page: React.FC<SystemTestPageProps> = ({ params }) => {
                   {currentQuestion?.with_chooses ? (
                     currentQuestion.answers.map((answer) => (
                       <div key={answer.id} className={cnSystemCreatePage('option')} onClick={handleOptionClick(answer)}>
-                        <CheckBox value={answer.body} checked={currentOption?.id === answer.id} />
+                        <CheckBox value={answer.body} checked={currentOption?.id === answer.id} readOnly />
                         <Text>{answer.body}</Text>
                       </div>
                     ))

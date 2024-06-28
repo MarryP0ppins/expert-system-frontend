@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { attributeValueValidation } from './attributeValues';
+import { attributeWithAttrValueForObjectsValidation } from './attributes';
 import {
   objectAttributeAttributeValueNewValidation,
   objectAttributeAttributeValueValidation,
@@ -23,7 +23,8 @@ export const objectWithIdsNewValidation = objectValidation.omit({ id: true }).ex
 });
 
 export const objectWithAttrValuesValidation = objectValidation.extend({
-  attributesValues: z.array(attributeValueValidation),
+  deleted: z.boolean().default(false),
+  attributes: z.array(attributeWithAttrValueForObjectsValidation),
 });
 
 export const formObjectWithAttrValuesValidation = z.object({

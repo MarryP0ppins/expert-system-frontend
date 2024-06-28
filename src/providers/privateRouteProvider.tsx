@@ -12,7 +12,7 @@ const allowURL = [
   /^\/$/,
   /^\/login$/,
   /^\/registration$/,
-  /^\/systems\/\d+\/test$/,
+  /^\/system\/\d+\/test$/,
   /^\/verifyemail\/[a-zA-Z0-9]+$/,
   /^\/forgotpassword/,
   /^\/resetpassword\/[a-zA-Z0-9]+$/,
