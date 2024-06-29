@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 
+import { TQueryKey } from '@/api';
 import { getQuestionsWithAnswers } from '@/api/services/questions';
 import Button from '@/components/Button';
 import Input from '@/components/Input';
@@ -38,7 +39,7 @@ const Page: React.FC<PageProps> = ({ params }) => {
 
   const { data, isLoading } = useSuspenseQuery({
     queryKey: [QUESTIONS.GET, { system: system_id }],
-    queryFn: () => getQuestionsWithAnswers(system_id),
+    queryFn: (params: TQueryKey<{ system: number }>) => getQuestionsWithAnswers(params.queryKey[1].system),
     select: (data) => normilizeResponseDataQuestionWithAnswer(data),
   });
 

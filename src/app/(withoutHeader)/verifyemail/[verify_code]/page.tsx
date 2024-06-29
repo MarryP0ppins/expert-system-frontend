@@ -3,6 +3,7 @@ import React, { useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
+import { TQueryKey } from '@/api';
 import { emailVerifyPost } from '@/api/services/user';
 import Loader from '@/components/Loader';
 import Text from '@/components/Text';
@@ -26,7 +27,7 @@ const Page: React.FC<VerifyEmailPageLayoutProps> = ({ params }) => {
   const setStates = useUserStore((store) => store.setStates);
   const { isSuccess, error, data } = useQuery({
     queryKey: [USER.EMAILVERIFY, verify_code],
-    queryFn: () => emailVerifyPost(verify_code ?? ''),
+    queryFn: (params: TQueryKey<string | undefined>) => emailVerifyPost(params.queryKey[1] ?? ''),
     enabled: !!verify_code,
     gcTime: 0,
     staleTime: 0,

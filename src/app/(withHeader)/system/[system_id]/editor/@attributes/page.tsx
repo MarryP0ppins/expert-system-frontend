@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 
+import { TQueryKey } from '@/api';
 import { getAttributesWithValues } from '@/api/services/attributes';
 import AttributeField from '@/components/AttributeField';
 import Button from '@/components/Button';
@@ -41,7 +42,7 @@ const Page: React.FC<PageProps> = ({ params }) => {
 
   const { data, isLoading } = useSuspenseQuery({
     queryKey: [ATTRIBUTES.GET, { system: system_id }],
-    queryFn: () => getAttributesWithValues(system_id),
+    queryFn: (params: TQueryKey<{ system: number }>) => getAttributesWithValues(params.queryKey[1].system),
     select: (data) => normilizeResponseDataAttributeWithAttributevalue(data),
   });
 

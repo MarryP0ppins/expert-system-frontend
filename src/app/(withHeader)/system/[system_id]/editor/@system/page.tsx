@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 
+import { TQueryKey } from '@/api';
 import { getImage } from '@/api/services/image';
 import { getSystemOne, updateSystem } from '@/api/services/systems';
 import Button from '@/components/Button';
@@ -38,7 +39,7 @@ const Page: React.FC<PageProps> = ({ params }) => {
 
   const { data } = useSuspenseQuery({
     queryKey: [SYSTEMS.RETRIEVE, { system: system_id }],
-    queryFn: async () => await getSystemOne(system_id),
+    queryFn: (params: TQueryKey<{ system: number }>) => getSystemOne(params.queryKey[1].system),
     initialData: () =>
       queryClient
         .getQueryData<TSystemsWithPage>([SYSTEMS.GET_USER, { user: user?.id, all_types: true }])
@@ -47,9 +48,9 @@ const Page: React.FC<PageProps> = ({ params }) => {
 
   const { data: image } = useQuery({
     queryKey: ['image', data.image_uri],
-    queryFn: async () => {
+    queryFn: async (params: TQueryKey<string>) => {
       if (data.image_uri) {
-        const img = await getImage(data.image_uri);
+        const img = await getImage(params.queryKey[1]);
         const dt = new DataTransfer();
         dt.items.add(img);
         return dt.files;

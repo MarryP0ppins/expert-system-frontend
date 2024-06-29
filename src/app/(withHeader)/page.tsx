@@ -1,6 +1,7 @@
 import React from 'react';
 import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query';
 
+import { TQueryKey } from '@/api';
 import { getSystems } from '@/api/services/systems';
 import { PageStepper } from '@/components/PageStepper';
 import { SYSTEMS } from '@/constants';
@@ -15,8 +16,8 @@ const cnAppPage = classname(classes, 'appPage');
 const Page: React.FC = async () => {
   const queryClient = new QueryClient();
   await queryClient.prefetchQuery({
-    queryKey: [SYSTEMS.GET, { page: 1 }],
-    queryFn: async () => await getSystems({ per_page: 20 }),
+    queryKey: [SYSTEMS.GET, { page: 1, per_page: 20 }],
+    queryFn: (params: TQueryKey<{ page: number; per_page: number }>) => getSystems(params.queryKey[1]),
   });
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

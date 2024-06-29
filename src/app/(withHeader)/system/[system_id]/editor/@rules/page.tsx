@@ -6,6 +6,7 @@ import { useMutation, useQueryClient, useSuspenseQueries } from '@tanstack/react
 import dynamic from 'next/dynamic';
 import { v4 as uuidv4 } from 'uuid';
 
+import { TQueryKey } from '@/api';
 import { getAttributesWithValues } from '@/api/services/attributes';
 import { createClauses, deleteClauses, updateClauses } from '@/api/services/clauses';
 import { getQuestionsWithAnswers } from '@/api/services/questions';
@@ -54,38 +55,47 @@ const Page: React.FC<PageProps> = ({ params }) => {
     queries: [
       {
         queryKey: [ATTRIBUTES.GET, { system: system_id }],
-        queryFn: async () => {
-          const res = await getAttributesWithValues(system_id);
-          setAttributes(res);
-          return res;
-        },
+        queryFn: (params: TQueryKey<{ system: number }>) => getAttributesWithValues(params.queryKey[1].system),
       },
       {
         queryKey: [QUESTIONS.GET, { system: system_id }],
-        queryFn: async () => {
-          const res = await getQuestionsWithAnswers(system_id);
-          setQuestions(res);
-          return res;
-        },
+        queryFn: (params: TQueryKey<{ system: number }>) => getQuestionsWithAnswers(params.queryKey[1].system),
       },
       {
         queryKey: [RULES.GET, { system: system_id }],
-        queryFn: async () => getRulesWithClausesAndEffects(system_id),
+        queryFn: (params: TQueryKey<{ system: number }>) => getRulesWithClausesAndEffects(params.queryKey[1].system),
       },
     ],
   });
-  const { attributesData, attributesIsLoading } = useMemo(
-    () => ({ attributesData: attributeQueryResult.data, attributesIsLoading: attributeQueryResult.isLoading }),
+  const { attributesData, attributesIsLoading, attributesIsSuccess } = useMemo(
+    () => ({
+      attributesData: attributeQueryResult.data,
+      attributesIsLoading: attributeQueryResult.isLoading,
+      attributesIsSuccess: attributeQueryResult.isSuccess,
+    }),
     [attributeQueryResult],
   );
-  const { questionsData, questionsIsLoading } = useMemo(
-    () => ({ questionsData: questionsQueryResult.data, questionsIsLoading: questionsQueryResult.isLoading }),
+  const { questionsData, questionsIsLoading, questionsIsSuccess } = useMemo(
+    () => ({
+      questionsData: questionsQueryResult.data,
+      questionsIsLoading: questionsQueryResult.isLoading,
+      questionsIsSuccess: questionsQueryResult.isSuccess,
+    }),
     [questionsQueryResult],
   );
   const { rulesData, rulesIsLoading } = useMemo(
     () => ({ rulesData: rulesQueryResult.data, rulesIsLoading: rulesQueryResult.isLoading }),
     [rulesQueryResult],
   );
+
+  useEffect(() => {
+    if (attributesIsSuccess) {
+      setAttributes(attributesData);
+    }
+    if (questionsIsSuccess) {
+      setQuestions(questionsData);
+    }
+  }, [attributesData, attributesIsSuccess, questionsData, questionsIsSuccess, setAttributes, setQuestions]);
 
   const questionsOptions = useMemo<Option[]>(
     () => [allQuestionSelect].concat(questionsData.map((question) => ({ label: question.body, value: question.id }))),
@@ -321,7 +331,7 @@ const Page: React.FC<PageProps> = ({ params }) => {
       }),
     [append, system_id],
   );
-  //
+
   const handleDeleteRule = useCallback(
     (rule: TRuleForForm, ruleIndex: number) => () => {
       if (rule.id === -1) {

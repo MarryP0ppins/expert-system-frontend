@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient, useSuspenseQueries } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 
+import { TQueryKey } from '@/api';
 import { getAttributesWithValues } from '@/api/services/attributes';
 import { getObjectsWithAttrValues } from '@/api/services/objects';
 import Button from '@/components/Button';
@@ -38,11 +39,11 @@ const Page: React.FC<PageProps> = ({ params }) => {
     queries: [
       {
         queryKey: [OBJECTS.GET, { system: system_id }],
-        queryFn: () => getObjectsWithAttrValues(system_id),
+        queryFn: (params: TQueryKey<{ system: number }>) => getObjectsWithAttrValues(params.queryKey[1].system),
       },
       {
         queryKey: [ATTRIBUTES.GET, { system: system_id }],
-        queryFn: () => getAttributesWithValues(system_id),
+        queryFn: (params: TQueryKey<{ system: number }>) => getAttributesWithValues(params.queryKey[1].system),
         select: (data: TAttributeWithAttributeValues[]): TAttributeWithAttrValueForObjects[] =>
           data.map((attribute) => ({
             ...attribute,

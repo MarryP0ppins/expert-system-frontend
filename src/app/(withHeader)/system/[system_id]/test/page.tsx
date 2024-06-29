@@ -4,6 +4,7 @@ import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useShallow } from 'zustand/react/shallow';
 
+import { TQueryKey } from '@/api';
 import { createHistory } from '@/api/services/history';
 import { getSystemTest } from '@/api/services/systems';
 import Button from '@/components/Button';
@@ -43,7 +44,7 @@ const Page: React.FC<SystemTestPageProps> = ({ params }) => {
 
   const { data: testData } = useSuspenseQuery({
     queryKey: [SYSTEMS.TEST, { system: system_id }],
-    queryFn: () => getSystemTest(system_id),
+    queryFn: (params: TQueryKey<{ system: number }>) => getSystemTest(params.queryKey[1].system),
   });
 
   useEffect(() => setRules(testData.rules), [testData.rules]);

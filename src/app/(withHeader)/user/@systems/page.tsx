@@ -4,6 +4,7 @@ import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-q
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 
+import { TQueryKey } from '@/api';
 import { deleteSystem, getSystems } from '@/api/services/systems';
 import Button from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -32,7 +33,7 @@ export const Page: React.FC = () => {
 
   const { data, isSuccess, isLoading } = useSuspenseQuery({
     queryKey: [SYSTEMS.GET_USER, { user: user?.id, all_types: true }],
-    queryFn: async () => await getSystems({ user_id: user?.id, all_types: true }),
+    queryFn: (params: TQueryKey<{ user?: number; all_types: boolean }>) => getSystems(params.queryKey[1]),
   });
 
   const addMutate = useMutation({

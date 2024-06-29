@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } fro
 import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import { notFound, useRouter, useSearchParams } from 'next/navigation';
 
+import { TQueryKey } from '@/api';
 import { getAttributesWithValues } from '@/api/services/attributes';
 import { getObjectsWithAttrValues } from '@/api/services/objects';
 import { getQuestionsWithAnswers } from '@/api/services/questions';
@@ -62,7 +63,7 @@ const Layout: React.FC<SystemEditorPageLayoutProps> = ({ system, attributes, obj
   const queryClient = useQueryClient();
   const { data: systemData, status } = useQuery({
     queryKey: [SYSTEMS.RETRIEVE, { system: system_id }],
-    queryFn: async () => await getSystemOne(system_id ?? -1),
+    queryFn: (params: TQueryKey<{ system?: number }>) => getSystemOne(params.queryKey[1].system ?? -1),
     initialData: () =>
       queryClient
         .getQueryData<TSystemsWithPage>([SYSTEMS.GET_USER, { user: user?.id, all_types: true }])
@@ -78,24 +79,25 @@ const Layout: React.FC<SystemEditorPageLayoutProps> = ({ system, attributes, obj
   const [attributeQueryResult, questionsQueryResult] = useQueries({
     queries: [
       {
-        queryKey: [ATTRIBUTES.GET, { system: system_id }],
-        queryFn: async () => getAttributesWithValues(system_id ?? -1),
-        enabled: !!systemData?.id && ![Section.ATTRIBUTES, Section.RULES].includes(section),
+        queryKey: [ATTRIBUTES.GET, { system: systemData?.id }],
+        queryFn: (params: TQueryKey<{ system?: number }>) => getAttributesWithValues(params.queryKey[1].system ?? -1),
+        enabled: !!systemData && ![Section.ATTRIBUTES, Section.RULES].includes(section),
       },
       {
         queryKey: [QUESTIONS.GET, { system: system_id }],
-        queryFn: async () => getQuestionsWithAnswers(system_id ?? -1),
-        enabled: !!systemData?.id && ![Section.QUESTIONS, Section.RULES].includes(section),
+        queryFn: (params: TQueryKey<{ system?: number }>) => getQuestionsWithAnswers(params.queryKey[1].system ?? -1),
+        enabled: !!systemData && ![Section.QUESTIONS, Section.RULES].includes(section),
       },
       {
         queryKey: [RULES.GET, { system: system_id }],
-        queryFn: async () => getRulesWithClausesAndEffects(system_id ?? -1),
-        enabled: !!systemData?.id && section !== Section.RULES,
+        queryFn: (params: TQueryKey<{ system?: number }>) =>
+          getRulesWithClausesAndEffects(params.queryKey[1].system ?? -1),
+        enabled: !!systemData && section !== Section.RULES,
       },
       {
         queryKey: [OBJECTS.GET, { system: system_id }],
-        queryFn: async () => getObjectsWithAttrValues(system_id ?? -1),
-        enabled: !!systemData?.id && section !== Section.OBJECTS,
+        queryFn: (params: TQueryKey<{ system?: number }>) => getObjectsWithAttrValues(params.queryKey[1].system ?? -1),
+        enabled: !!systemData && section !== Section.OBJECTS,
       },
     ],
   });

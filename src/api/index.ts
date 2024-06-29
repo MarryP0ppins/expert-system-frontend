@@ -2,6 +2,8 @@ import axios, { AxiosError, AxiosHeaderValue, AxiosRequestConfig, AxiosResponseH
 
 import { TErrorResponse } from '@/types/error';
 
+export type TQueryKey<T> = { queryKey: [string, T] };
+
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   withCredentials: true,

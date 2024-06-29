@@ -3,6 +3,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 
+import { TQueryKey } from '@/api';
 import { getHistories } from '@/api/services/history';
 import { CardSkeleton } from '@/components/CardSkeleton';
 import HistoryCard from '@/components/HistoryCard';
@@ -21,7 +22,7 @@ const Page: React.FC = () => {
 
   const { data, isSuccess, isLoading } = useQuery({
     queryKey: [HISTORIES.GET, { user: user?.id }],
-    queryFn: async () => await getHistories({ user: user?.id ?? -1 }),
+    queryFn: (params: TQueryKey<{ user?: number }>) => getHistories({ user: params.queryKey[1].user ?? -1 }),
     enabled: !!user,
   });
 

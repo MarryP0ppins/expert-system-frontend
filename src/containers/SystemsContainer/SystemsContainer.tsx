@@ -3,6 +3,7 @@ import React, { useCallback, useLayoutEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter, useSearchParams } from 'next/navigation';
 
+import { TQueryKey } from '@/api';
 import { getSystems } from '@/api/services/systems';
 import { Card } from '@/components/Card';
 import { CardSkeleton } from '@/components/CardSkeleton';
@@ -29,17 +30,13 @@ const SystemsContainer: React.FC = () => {
       SYSTEMS.GET,
       {
         page: currentPage,
+        per_page: 20,
         name,
         username,
       },
     ],
-    queryFn: async () =>
-      await getSystems({
-        page: currentPage,
-        name,
-        username,
-        per_page: 20,
-      }),
+    queryFn: (params: TQueryKey<{ page: number; per_page: number; name?: string; username?: string }>) =>
+      getSystems(params.queryKey[1]),
   });
 
   const handleClick = useCallback((id: number) => () => router.push(`/system/${id}/test`), [router]);
