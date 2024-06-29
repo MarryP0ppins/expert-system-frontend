@@ -6,16 +6,7 @@ import { useMutation, useQueryClient, useSuspenseQueries } from '@tanstack/react
 import dynamic from 'next/dynamic';
 
 import { getAttributesWithValues } from '@/api/services/attributes';
-import {
-  createObjectAttributeAttributeValue,
-  deleteObjectAttributeAttributeValue,
-} from '@/api/services/objectAttributeAttributeValue';
-import {
-  createObjectWithAttrValues,
-  deleteObjects,
-  getObjectsWithAttrValues,
-  updateObjects,
-} from '@/api/services/objects';
+import { getObjectsWithAttrValues } from '@/api/services/objects';
 import Button from '@/components/Button';
 import Input from '@/components/Input';
 import Loader from '@/components/Loader';
@@ -23,11 +14,11 @@ import ObjectField from '@/components/ObjectField';
 import { ATTRIBUTES, OBJECTS } from '@/constants';
 import AddIcon from '@/icons/AddIcon';
 import { TAttributeWithAttributeValues, TAttributeWithAttrValueForObjects } from '@/types/attributes';
-import { TObjectAttributeAttributeValueNew } from '@/types/objectAttributeAttributeValue';
 import { TResponseObjectPageMutate } from '@/types/objectPage';
-import { TObjectUpdate, TObjectWithAttrValues, TObjectWithAttrValuesForm, TObjectWithIdsNew } from '@/types/objects';
+import { TObjectWithAttrValues, TObjectWithAttrValuesForm, TObjectWithIds } from '@/types/objects';
 import { classname } from '@/utils/classname';
 import { objectPromiseAll } from '@/utils/objectPromiseAll';
+import { handleFormSubmit, normilizeObjects, normilizeResponseDataObjects } from '@/utils/objectsPage';
 import { formObjectWithAttrValuesValidation } from '@/validation/objects';
 
 import classes from './page.module.scss';
@@ -65,34 +56,13 @@ const Page: React.FC<PageProps> = ({ params }) => {
           })),
       },
     ],
-    combine: ([objectsQueryResult, attributeQueryResult]) => {
-      const result: TObjectWithAttrValues[] = [];
-      objectsQueryResult.data.forEach((object) => {
-        const attrValMap = new Map(
-          object.object_attribute_attributevalue_ids.map((ids) => [ids.attribute_value_id, ids.id]),
-        );
-
-        result.push({
-          ...object,
-          deleted: false,
-          attributes: attributeQueryResult.data.map((attribute) => ({
-            ...attribute,
-            values: attribute.values.map((attrValues) => {
-              const ids = attrValMap.get(attrValues.id);
-              return {
-                ...attrValues,
-                isActive: !!ids,
-                idsId: ids ?? -1,
-              };
-            }),
-          })),
-        });
-      });
-      return [
-        { data: { formData: result }, isLoading: objectsQueryResult.isLoading || attributeQueryResult.isLoading },
-        { data: attributeQueryResult.data, isLoading: attributeQueryResult.isLoading },
-      ];
-    },
+    combine: ([objectsQueryResult, attributeQueryResult]) => [
+      {
+        data: normilizeResponseDataObjects(objectsQueryResult.data, attributeQueryResult.data),
+        isLoading: objectsQueryResult.isLoading || attributeQueryResult.isLoading,
+      },
+      { data: attributeQueryResult.data, isLoading: attributeQueryResult.isLoading },
+    ],
   });
 
   const { attributesData, attributesIsLoading } = useMemo(
@@ -116,6 +86,7 @@ const Page: React.FC<PageProps> = ({ params }) => {
     control,
     handleSubmit,
     getValues,
+    reset,
     formState: { dirtyFields, isValid },
   } = useForm<TObjectWithAttrValuesForm>({
     defaultValues: objectsWithAttrValuesData,
@@ -124,7 +95,11 @@ const Page: React.FC<PageProps> = ({ params }) => {
   });
   const { mutate, isPending } = useMutation({
     mutationFn: (responseList: TResponseObjectPageMutate) => objectPromiseAll(responseList),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: [OBJECTS.GET, { system: system_id }] }),
+    onSuccess: (data) => {
+      const newData = normilizeObjects(getValues(), data);
+      reset(normilizeResponseDataObjects(newData, attributesData));
+      queryClient.setQueryData<TObjectWithIds[]>([OBJECTS.GET, { system: system_id }], newData);
+    },
   });
 
   const { fields, append, remove, update } = useFieldArray({ control, name: 'formData', keyName: 'arrayId' });
@@ -142,68 +117,6 @@ const Page: React.FC<PageProps> = ({ params }) => {
     return isDirtyForm;
   }, [dirtyFields.formData, getValues]);
 
-  const handleFormSubmit = useCallback(
-    (form: TObjectWithAttrValuesForm) => {
-      const objectNew: TObjectWithIdsNew[] = [];
-      const objectUpdate: TObjectUpdate[] = [];
-      const idsNew: TObjectAttributeAttributeValueNew[] = [];
-      const objectDelete: number[] = [];
-      const idsDelete: number[] = [];
-
-      form.formData.forEach((object, objectIndex) => {
-        if (object.deleted) {
-          objectDelete.push(object.id);
-          return;
-        }
-        const newIds: TObjectAttributeAttributeValueNew[] = [];
-
-        object.attributes.forEach((attribue) =>
-          attribue.values.forEach((attribueValue) => {
-            if (attribueValue.added) {
-              newIds.push({ object_id: object.id, attribute_id: attribue.id, attribute_value_id: attribueValue.id });
-              return;
-            }
-            if (attribueValue.deleted) {
-              idsDelete.push(attribueValue.idsId);
-            }
-          }),
-        );
-        if (object.id === -1) {
-          objectNew.push({
-            system_id: object.system_id,
-            name: object.name,
-            object_attribute_attributevalue_ids: newIds,
-          });
-        } else {
-          idsNew.push(...newIds);
-        }
-
-        if (!dirtyFields.formData?.[objectIndex]?.id && dirtyFields.formData?.[objectIndex]?.name) {
-          objectUpdate.push({ id: object.id, name: object.name });
-        }
-      });
-      const responses: TResponseObjectPageMutate = {};
-
-      if (objectNew.length) {
-        responses.createObjectWithAttrValues = createObjectWithAttrValues(objectNew);
-      }
-      if (objectUpdate.length) {
-        responses.updateObjects = updateObjects(objectUpdate);
-      }
-      if (idsNew.length) {
-        responses.createObjectAttributeAttributeValue = createObjectAttributeAttributeValue(idsNew);
-      }
-      if (idsDelete.length) {
-        responses.deleteObjectAttributeAttributeValue = deleteObjectAttributeAttributeValue(idsDelete);
-      }
-      if (objectDelete.length) {
-        responses.deleteObjects = deleteObjects(objectDelete);
-      }
-
-      mutate(responses);
-    },
-    [dirtyFields.formData, mutate],
-  );
   const handleAddObject = useCallback(
     () => append({ id: -1, system_id: system_id, name: '', attributes: attributesData, deleted: false }),
     [append, attributesData, system_id],
@@ -221,7 +134,7 @@ const Page: React.FC<PageProps> = ({ params }) => {
 
   return (
     <main className={cnObjects()}>
-      <form onSubmit={handleSubmit(handleFormSubmit)} className={cnObjects('form')}>
+      <form onSubmit={handleSubmit(handleFormSubmit(dirtyFields, mutate))} className={cnObjects('form')}>
         <div className={cnObjects('objectsList')}>
           {fields.map((object, objectIndex) => (
             <ObjectField
@@ -230,6 +143,7 @@ const Page: React.FC<PageProps> = ({ params }) => {
               objectId={object.id}
               control={control}
               objectIndex={objectIndex}
+              attributes={object.attributes}
               onDelete={handleDeleteObject(object, objectIndex)}
             />
           ))}

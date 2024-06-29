@@ -51,9 +51,9 @@ export const normilizeAttributeWithAttributevalue = (
     attributeWithAttributevalue.push(newAttribute);
   });
 
-  const result = attributeWithAttributevalue.concat(responsesData.createAttributesWithValues ?? []);
+  attributeWithAttributevalue.push(...(responsesData.createAttributesWithValues ?? []));
 
-  return result;
+  return attributeWithAttributevalue;
 };
 
 export const normilizeResponseDataAttributeWithAttributevalue = (

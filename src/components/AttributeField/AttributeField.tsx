@@ -29,6 +29,7 @@ const AttributeField: React.FC<AttributeFieldProps> = ({ isVisible = true, contr
     field,
     fieldState: { error },
   } = useController({ control, name: `formData.${index}.name` });
+
   const { fields, append, remove, update } = useFieldArray({
     control,
     name: `formData.${index}.values`,

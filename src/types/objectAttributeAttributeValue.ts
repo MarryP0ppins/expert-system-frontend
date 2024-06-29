@@ -5,6 +5,6 @@ import {
   objectAttributeAttributeValueValidation,
 } from '@/validation/objectAttributeAttributeValue';
 
-export type TObjectAttributeAttributeValueValidation = z.infer<typeof objectAttributeAttributeValueValidation>;
+export type TObjectAttributeAttributeValue = z.infer<typeof objectAttributeAttributeValueValidation>;
 
 export type TObjectAttributeAttributeValueNew = z.infer<typeof objectAttributeAttributeValueNewValidation>;

@@ -55,9 +55,9 @@ export const normilizeQuestionsWithAnswers = (
     questionsWithAnswers.push(newQuestion);
   });
 
-  const result = questionsWithAnswers.concat(responsesData.createQuestionsWithAnswers ?? []);
+  questionsWithAnswers.push(...(responsesData.createQuestionsWithAnswers ?? []));
 
-  return result;
+  return questionsWithAnswers;
 };
 
 export const normilizeResponseDataQuestionWithAnswer = (data: TQuestionWithAnswers[]): TQuestionWithAnswersForm => ({
