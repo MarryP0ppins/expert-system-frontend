@@ -2,7 +2,7 @@
 import React, { useCallback, useMemo } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQueryClient, useSuspenseQueries } from '@tanstack/react-query';
+import { useMutation, useSuspenseQueries } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 
 import { TQueryKey } from '@/api';
@@ -18,6 +18,7 @@ import { TAttributeWithAttributeValues, TAttributeWithAttrValueForObjects } from
 import { TResponseObjectPageMutate } from '@/types/objectPage';
 import { TObjectWithAttrValues, TObjectWithAttrValuesForm, TObjectWithIds } from '@/types/objects';
 import { classname } from '@/utils/classname';
+import { getQueryClient } from '@/utils/get-query-client';
 import { objectPromiseAll } from '@/utils/objectPromiseAll';
 import { handleFormSubmit, normilizeObjects, normilizeResponseDataObjects } from '@/utils/objectsPage';
 import { formObjectWithAttrValuesValidation } from '@/validation/objects';
@@ -31,7 +32,7 @@ type PageProps = {
 };
 
 const Page: React.FC<PageProps> = ({ params }) => {
-  const queryClient = useQueryClient();
+  const queryClient = getQueryClient();
 
   const system_id = useMemo(() => Number(params.system_id) ?? -1, [params]);
 

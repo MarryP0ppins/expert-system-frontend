@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQueryClient, useSuspenseQueries } from '@tanstack/react-query';
+import { useMutation, useSuspenseQueries } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -29,6 +29,7 @@ import { TRuleAttributeAttributeValueNew } from '@/types/ruleAttributeAttributeV
 import { TRuleQuestionAnswerNew } from '@/types/ruleQuestionAnswer';
 import { TRuleForForm, TRuleForm, TRuleNew } from '@/types/rules';
 import { classname } from '@/utils/classname';
+import { getQueryClient } from '@/utils/get-query-client';
 import { formRuleValidation } from '@/validation/rules';
 
 import classes from './page.module.scss';
@@ -45,7 +46,7 @@ const allQuestionSelect: Option = {
 };
 
 const Page: React.FC<PageProps> = ({ params }) => {
-  const queryClient = useQueryClient();
+  const queryClient = getQueryClient();
   const { setAttributes, setQuestions } = useRulePageStore((store) => store);
   const [selectQuestion, setSelectQuestion] = useState<Option>(allQuestionSelect);
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query';
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 
 import { TQueryKey } from '@/api';
 import { getSystems } from '@/api/services/systems';
@@ -8,13 +8,14 @@ import { SYSTEMS } from '@/constants';
 import { SearchSystemContainer } from '@/containers/SearchSystemContainer';
 import { ReposContainer } from '@/containers/SystemsContainer';
 import { classname } from '@/utils/classname';
+import { getQueryClient } from '@/utils/get-query-client';
 
 import classes from './page.module.scss';
 
 const cnAppPage = classname(classes, 'appPage');
 
 const Page: React.FC = async () => {
-  const queryClient = new QueryClient();
+  const queryClient = getQueryClient();
   await queryClient.prefetchQuery({
     queryKey: [SYSTEMS.GET, { page: 1, per_page: 20 }],
     queryFn: (params: TQueryKey<{ page: number; per_page: number }>) => getSystems(params.queryKey[1]),

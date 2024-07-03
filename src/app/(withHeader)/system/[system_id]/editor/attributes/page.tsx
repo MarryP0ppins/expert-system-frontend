@@ -2,7 +2,7 @@
 import React, { useCallback, useMemo } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 
 import { TQueryKey } from '@/api';
@@ -25,6 +25,7 @@ import {
   normilizeResponseDataAttributeWithAttributevalue,
 } from '@/utils/attributeWithAttributeValuePage';
 import { classname } from '@/utils/classname';
+import { getQueryClient } from '@/utils/get-query-client';
 import { objectPromiseAll } from '@/utils/objectPromiseAll';
 import { formAttributeWithAttributeValuesValidation } from '@/validation/attributes';
 
@@ -37,7 +38,7 @@ type PageProps = {
 };
 
 const Page: React.FC<PageProps> = ({ params }) => {
-  const queryClient = useQueryClient();
+  const queryClient = getQueryClient();
   const system_id = useMemo(() => Number(params.system_id), [params]);
 
   const { data, isLoading } = useSuspenseQuery({

@@ -1,6 +1,6 @@
 'use client';
 import React, { useCallback, useState } from 'react';
-import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 
@@ -18,6 +18,7 @@ import useSystemStore from '@/store/systemStore';
 import useUserStore from '@/store/userStore';
 import { TSystemsWithPage } from '@/types/systems';
 import { classname } from '@/utils/classname';
+import { getQueryClient } from '@/utils/get-query-client';
 
 import classes from './page.module.scss';
 
@@ -27,7 +28,7 @@ export const Page: React.FC = () => {
   const router = useRouter();
   const user = useUserStore((store) => store.user);
   const { downloadSystemBackup, importSystem } = useSystemStore((store) => store);
-  const queryClient = useQueryClient();
+  const queryClient = getQueryClient();
 
   const [systemFile, setSystemFile] = useState<File>();
 

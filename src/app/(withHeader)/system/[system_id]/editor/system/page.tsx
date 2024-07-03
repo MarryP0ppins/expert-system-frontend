@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 
 import { TQueryKey } from '@/api';
@@ -21,6 +21,7 @@ import useUserStore from '@/store/userStore';
 import { TErrorResponse } from '@/types/error';
 import { TSystem, TSystemsWithPage, TSystemUpdate, TSystemUpdateBefore } from '@/types/systems';
 import { classname } from '@/utils/classname';
+import { getQueryClient } from '@/utils/get-query-client';
 import { systemUpdateValidation } from '@/validation/system';
 
 import classes from './page.module.scss';
@@ -32,7 +33,7 @@ type PageProps = {
 };
 
 const Page: React.FC<PageProps> = ({ params }) => {
-  const queryClient = useQueryClient();
+  const queryClient = getQueryClient();
   const user = useUserStore((store) => store.user);
 
   const system_id = useMemo(() => Number(params.system_id) ?? -1, [params]);

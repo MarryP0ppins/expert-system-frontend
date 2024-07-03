@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
 import { createSystem } from '@/api/services/systems';
@@ -19,6 +19,7 @@ import { TErrorResponse } from '@/types/error';
 import { TSystem, TSystemNew, TSystemsWithPage } from '@/types/systems';
 import { classname } from '@/utils/classname';
 import { errorParser } from '@/utils/errorParser';
+import { getQueryClient } from '@/utils/get-query-client';
 import { systemNewValidation } from '@/validation/system';
 
 import classes from './page.module.scss';
@@ -40,7 +41,7 @@ const Page: React.FC = () => {
     mode: 'all',
   });
 
-  const queryClient = useQueryClient();
+  const queryClient = getQueryClient();
 
   const { mutate, isPending, error, status, data } = useMutation<TSystem, TErrorResponse, TSystemNew>({
     mutationFn: createSystem,
