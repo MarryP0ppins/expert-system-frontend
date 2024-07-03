@@ -80,7 +80,7 @@ export const handleFormSubmit =
     const answersNew: TAnswerNew[] = [];
     const questionsDelete: number[] = [];
     const answersDelete: number[] = [];
-    console.log(form);
+
     form.formData.forEach((question, questionIndex) => {
       const newAnswersNewQuestions: string[] = [];
 

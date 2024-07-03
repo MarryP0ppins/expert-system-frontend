@@ -37,6 +37,5 @@ export const normilizeRules = (data: TRuleForm): TRule[] => {
     rules.push({ ...rule, clauses, rule_question_answer_ids, rule_attribute_attributevalue_ids });
   });
 
-  console.log(rules);
   return rules;
 };

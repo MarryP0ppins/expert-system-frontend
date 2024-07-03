@@ -68,7 +68,7 @@ const Page: React.FC = () => {
   const handleFormSubmit = useCallback((data: TSystemNew) => mutate(data), [mutate]);
 
   const formWatch = watch();
-  console.log(status);
+
   useEffect(() => {
     if (status === 'success') {
       router.push(`/system/${data?.id}/editor`);

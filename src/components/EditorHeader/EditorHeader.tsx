@@ -73,11 +73,7 @@ const EditorHeader: React.FC = () => {
     queries: [
       {
         queryKey: [ATTRIBUTES.GET, { system: systemId }],
-        queryFn: async (params: TQueryKey<{ system?: number }>) => {
-          const res = await getAttributesWithValues(params.queryKey[1].system ?? -1);
-          console.log('editor header');
-          return res;
-        },
+        queryFn: (params: TQueryKey<{ system?: number }>) => getAttributesWithValues(params.queryKey[1].system ?? -1),
         enabled:
           !!systemData && [Section.ATTRIBUTES, Section.RULES].every((section) => section !== selectedLayoutSegment),
       },
@@ -100,23 +96,22 @@ const EditorHeader: React.FC = () => {
       },
     ],
   });
-  const memoQueryResult = useMemo(
-    () => ({
-      attributesIsSuccess: attributeQueryResult.isSuccess,
-      attributesData: attributeQueryResult.data ?? [],
-      questionsIsSuccess: questionsQueryResult.isSuccess,
-      questionsData: questionsQueryResult.data ?? [],
-    }),
-    [attributeQueryResult, questionsQueryResult],
-  );
+
   useEffect(() => {
-    if (memoQueryResult.attributesIsSuccess) {
-      setAttributes(memoQueryResult.attributesData);
+    if (attributeQueryResult.isSuccess) {
+      setAttributes(attributeQueryResult.data);
     }
-    if (memoQueryResult.questionsIsSuccess) {
-      setQuestions(memoQueryResult.questionsData);
+    if (questionsQueryResult.isSuccess) {
+      setQuestions(questionsQueryResult.data);
     }
-  }, [memoQueryResult, setAttributes, setQuestions]);
+  }, [
+    attributeQueryResult.data,
+    attributeQueryResult.isSuccess,
+    questionsQueryResult.data,
+    questionsQueryResult.isSuccess,
+    setAttributes,
+    setQuestions,
+  ]);
 
   return (
     <header className={cnEditorHeader()}>

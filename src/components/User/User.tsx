@@ -79,7 +79,7 @@ const User: React.FC = () => {
               {user?.username}
             </Text>
           </div>
-          <Link href="/user" className={cnUser('options')}>
+          <Link href="/user/profile" className={cnUser('options')}>
             <UserIcon />
             <Text tag={TEXT_TAG.span} view={TEXT_VIEW.p18}>
               Личный кабинет

@@ -2,11 +2,14 @@
 import React, { useCallback, useState } from 'react';
 import Popup from 'reactjs-popup';
 import moment from 'moment';
+import Link from 'next/link';
 
 import Text, { TEXT_TAG, TEXT_VIEW, TEXT_WEIGHT } from '@/components/Text';
 import CloseIcon from '@/icons/CloseIcon';
 import { THistoryResult } from '@/types/history';
 import { classname } from '@/utils/classname';
+
+import Button from '../Button';
 
 import classes from './HistoryCard.module.scss';
 
@@ -14,11 +17,11 @@ export type CardProps = {
   id: number;
   className?: string;
   title: string;
+  systemId: number;
   answered_questions: string;
   results: THistoryResult[];
   started_at: string;
   finished_at: string;
-  onClick?: () => void;
 };
 
 const cnCard = classname(classes, 'history-card');
@@ -28,10 +31,10 @@ const HistoryCard: React.FC<CardProps> = ({
   id,
   title,
   answered_questions,
+  systemId,
   results,
   started_at,
   finished_at,
-  onClick,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -46,7 +49,7 @@ const HistoryCard: React.FC<CardProps> = ({
   return (
     <Popup
       trigger={
-        <div className={cnCard() + ` ${className}`} id={String(id)} onClick={onClick}>
+        <div className={cnCard() + ` ${className}`} id={String(id)}>
           <div className={cnCard('info')}>
             <Text
               tag={TEXT_TAG.span}
@@ -93,6 +96,11 @@ const HistoryCard: React.FC<CardProps> = ({
                   {`${index + 1}. ${result.result}`}
                 </Text>
               ))}
+            </div>
+            <div className={cnCard('repeatButton')}>
+              <Link href={`/system/${systemId}/test`}>
+                <Button>Пройти еще раз</Button>
+              </Link>
             </div>
           </div>
         </div>

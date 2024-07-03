@@ -76,4 +76,10 @@
     color: $brand;
     cursor: pointer;
   }
+
+  &-repeatButton {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
 }

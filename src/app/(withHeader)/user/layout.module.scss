@@ -7,24 +7,4 @@
 
   min-height: 100%;
   width: 100%;
-
-  &-header {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-evenly;
-    gap: $space-m;
-    width: 100%;
-  }
-
-  &-section {
-    cursor: pointer;
-    width: 184px;
-    margin-top: 12px;
-    font-weight: 500;
-
-    &_selected {
-      text-decoration: underline;
-    }
-  }
 }

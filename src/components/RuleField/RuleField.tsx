@@ -5,8 +5,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { OPERATOR } from '@/constants';
 import AddIcon from '@/icons/AddIcon';
 import CloseIcon from '@/icons/CloseIcon';
-import { TAttributeWithAttributeValues } from '@/types/attributes';
-import { TQuestionWithAnswers } from '@/types/questions';
 import { TRuleAttributeAttributeValue } from '@/types/ruleAttributeAttributeValue';
 import { TRuleQuestionAnswer } from '@/types/ruleQuestionAnswer';
 import { TRuleForm } from '@/types/rules';
@@ -27,8 +25,6 @@ type RuleFieldProps = {
   ruleIndex: number;
   control: Control<TRuleForm>;
   handleDeleteRule: () => void;
-  allAttributes: TAttributeWithAttributeValues[];
-  allQuestions: TQuestionWithAnswers[];
 };
 
 const cnFields = classname(classes, 'fieldWithFields');

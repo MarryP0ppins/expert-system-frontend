@@ -68,39 +68,29 @@ const Page: React.FC<PageProps> = ({ params }) => {
       },
     ],
   });
-  const { attributesData, attributesIsLoading, attributesIsSuccess } = useMemo(
-    () => ({
-      attributesData: attributeQueryResult.data,
-      attributesIsLoading: attributeQueryResult.isLoading,
-      attributesIsSuccess: attributeQueryResult.isSuccess,
-    }),
-    [attributeQueryResult],
-  );
-  const { questionsData, questionsIsLoading, questionsIsSuccess } = useMemo(
-    () => ({
-      questionsData: questionsQueryResult.data,
-      questionsIsLoading: questionsQueryResult.isLoading,
-      questionsIsSuccess: questionsQueryResult.isSuccess,
-    }),
-    [questionsQueryResult],
-  );
-  const { rulesData, rulesIsLoading } = useMemo(
-    () => ({ rulesData: rulesQueryResult.data, rulesIsLoading: rulesQueryResult.isLoading }),
-    [rulesQueryResult],
-  );
 
   useEffect(() => {
-    if (attributesIsSuccess) {
-      setAttributes(attributesData);
+    if (attributeQueryResult.isSuccess) {
+      setAttributes(attributeQueryResult.data);
     }
-    if (questionsIsSuccess) {
-      setQuestions(questionsData);
+    if (questionsQueryResult.isSuccess) {
+      setQuestions(questionsQueryResult.data);
     }
-  }, [attributesData, attributesIsSuccess, questionsData, questionsIsSuccess, setAttributes, setQuestions]);
+  }, [
+    attributeQueryResult.data,
+    attributeQueryResult.isSuccess,
+    questionsQueryResult.data,
+    questionsQueryResult.isSuccess,
+    setAttributes,
+    setQuestions,
+  ]);
 
   const questionsOptions = useMemo<Option[]>(
-    () => [allQuestionSelect].concat(questionsData.map((question) => ({ label: question.body, value: question.id }))),
-    [questionsData],
+    () =>
+      [allQuestionSelect].concat(
+        questionsQueryResult.data.map((question) => ({ label: question.body, value: question.id })),
+      ),
+    [questionsQueryResult.data],
   );
 
   const handleQuestionSelect = useCallback((option: Option) => setSelectQuestion(option), []);
@@ -108,14 +98,16 @@ const Page: React.FC<PageProps> = ({ params }) => {
   const filtredRules = useMemo(
     () =>
       selectQuestion?.value === -1
-        ? rulesData
-        : rulesData.filter((rule) => rule.clauses.some((clause) => clause.question_id === selectQuestion?.value)),
-    [rulesData, selectQuestion],
+        ? rulesQueryResult.data
+        : rulesQueryResult.data.filter((rule) =>
+            rule.clauses.some((clause) => clause.question_id === selectQuestion?.value),
+          ),
+    [rulesQueryResult.data, selectQuestion],
   );
 
   const isLoading = useMemo(
-    () => attributesIsLoading || questionsIsLoading || rulesIsLoading,
-    [attributesIsLoading, questionsIsLoading, rulesIsLoading],
+    () => attributeQueryResult.isLoading || questionsQueryResult.isLoading || rulesQueryResult.isLoading,
+    [attributeQueryResult.isLoading, questionsQueryResult.isLoading, rulesQueryResult.isLoading],
   );
 
   const pageData = useMemo<TRuleForm>(() => {
@@ -364,8 +356,6 @@ const Page: React.FC<PageProps> = ({ params }) => {
               ruleId={rule.id}
               control={control}
               ruleIndex={ruleIndex}
-              allQuestions={questionsData}
-              allAttributes={attributesData}
               attributeRule={rule.attribute_rule}
               handleDeleteRule={handleDeleteRule(rule, ruleIndex)}
             />

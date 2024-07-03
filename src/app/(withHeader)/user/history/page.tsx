@@ -30,7 +30,9 @@ const Page: React.FC = () => {
     <div className={cnHistory()}>
       {!!data?.length &&
         isSuccess &&
-        data.map((system, index) => <HistoryCard key={index} {...system} title={system.system.name} />)}
+        data.map((system, index) => (
+          <HistoryCard key={index} {...system} systemId={system.system.id} title={system.system.name} />
+        ))}
       {!isLoading && !data?.length && <Text view={TEXT_VIEW.p20}>Нет пройденных систем</Text>}
       {isLoading && [...Array(6).keys()].map((index) => <CardSkeleton key={index} />)}
     </div>
