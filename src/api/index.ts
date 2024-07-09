@@ -53,7 +53,7 @@ export const patchApiRequest = <ResponseType, BodyType>(
       throw JSON.stringify(err.response?.data);
     });
 
-export const deleteApiRequest = <ResponseType, BodyType>(
+export const deleteApiRequest = <ResponseType, BodyType = unknown>(
   link: string,
   body?: BodyType,
   config?: AxiosRequestConfig,

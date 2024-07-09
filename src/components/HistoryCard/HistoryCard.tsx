@@ -10,6 +10,7 @@ import { THistoryResult } from '@/types/history';
 import { classname } from '@/utils/classname';
 
 import Button from '../Button';
+import ResultTable from '../ResultTable';
 
 import classes from './HistoryCard.module.scss';
 
@@ -97,11 +98,9 @@ const HistoryCard: React.FC<CardProps> = ({
                 </Text>
               ))}
             </div>
-            <div className={cnCard('repeatButton')}>
-              <Link href={`/system/${systemId}/test`}>
-                <Button>Пройти еще раз</Button>
-              </Link>
-            </div>
+            <Link href={`/system/${systemId}/test`} className={cnCard('repeatButton')}>
+              <Button>Пройти еще раз</Button>
+            </Link>
           </div>
         </div>
       }
@@ -118,29 +117,10 @@ const HistoryCard: React.FC<CardProps> = ({
         <Text view={TEXT_VIEW.p20} weight={TEXT_WEIGHT.bold} className={cnCard('modal-text')}>
           {title}
         </Text>
-        <Text view={TEXT_VIEW.p20} weight={TEXT_WEIGHT.bold} className={cnCard('modal-text')}>
-          Полные результаты тестирования
-        </Text>
-
-        <ol className={cnCard('modal-scroll')}>
-          {results.map((result, index) => (
-            <div key={index} className={cnCard('rawWrapper')}>
-              <li>
-                <Text
-                  tag={TEXT_TAG.span}
-                  view={TEXT_VIEW.p16}
-                  title={`${String(result.percent)}%`}
-                  className={cnCard('result')}
-                >
-                  {result.result}
-                </Text>
-              </li>
-              <Text tag={TEXT_TAG.span} view={TEXT_VIEW.p16} className={cnCard('result')}>
-                {`${result.percent}%`}
-              </Text>
-            </div>
-          ))}
-        </ol>
+        <ResultTable
+          title="Полные результаты тестирования"
+          results={results.map((result) => ({ key: result.result, value: result.percent }))}
+        />
       </div>
     </Popup>
   );

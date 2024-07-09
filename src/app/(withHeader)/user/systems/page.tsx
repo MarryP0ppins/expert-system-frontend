@@ -3,8 +3,10 @@ import React, { useCallback, useState } from 'react';
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
+import { useShallow } from 'zustand/react/shallow';
 
 import { TQueryKey } from '@/api';
+import { createLike, deleteLike } from '@/api/services/likes';
 import { deleteSystem, getSystems } from '@/api/services/systems';
 import Button from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -24,9 +26,11 @@ import classes from './page.module.scss';
 
 const cnUserProfile = classname(classes, 'user-systems');
 
-export const Page: React.FC = () => {
+const Page: React.FC = () => {
   const router = useRouter();
-  const user = useUserStore((store) => store.user);
+  const { user, likeMap, updateLikes } = useUserStore(
+    useShallow((store) => ({ user: store.user, likeMap: store.likes, updateLikes: store.updateLikes })),
+  );
   const { downloadSystemBackup, importSystem } = useSystemStore((store) => store);
   const queryClient = getQueryClient();
 
@@ -50,6 +54,7 @@ export const Page: React.FC = () => {
     },
     onSettled: () => setSystemFile(undefined),
   });
+
   const mutate = useMutation({
     mutationFn: deleteSystem,
     onMutate: async (data) => {
@@ -78,6 +83,20 @@ export const Page: React.FC = () => {
     },
   });
 
+  const starAddMutation = useMutation({
+    mutationFn: createLike,
+    onSuccess: (newLike) => {
+      updateLikes({ add: true, system_id: newLike.system_id, like_id: newLike.id });
+    },
+  });
+
+  const starRemoveMutation = useMutation({
+    mutationFn: deleteLike,
+    onSuccess: (deletedLike) => {
+      updateLikes({ add: false, system_id: deletedLike });
+    },
+  });
+
   const handleEdit = useCallback((id: number) => () => router.push(`/system/${id}/editor/system`), [router]);
   const handleClick = useCallback((id: number) => () => router.push(`/system/${id}/test`), [router]);
   const handleDelete = useCallback(
@@ -97,6 +116,19 @@ export const Page: React.FC = () => {
       addMutate.mutate(systemFile);
     }
   }, [addMutate, systemFile]);
+
+  const handleLikeUpdate = useCallback(
+    ({ add, system_id }: { add: boolean; system_id: number }) => {
+      if (user) {
+        if (add) {
+          starAddMutation.mutate({ system_id: system_id, user_id: user.id });
+        } else {
+          starRemoveMutation.mutate(likeMap.get(system_id) ?? -1);
+        }
+      }
+    },
+    [likeMap, starAddMutation, starRemoveMutation, user],
+  );
 
   return (
     <div className={cnUserProfile()}>
@@ -127,11 +159,15 @@ export const Page: React.FC = () => {
               image={system.image_uri}
               title={system.name}
               subtitle={system.about}
+              stars={system.stars}
+              canLike={!!user}
+              likeMap={likeMap}
               modifiable
               onEditClick={handleEdit(system.id)}
               onDeleteClick={handleDelete}
               onClick={handleClick(system.id)}
               onDownloadClick={handleDownload(system.id, system.name)}
+              onLikeMap={handleLikeUpdate}
             />
           ))}
         {!isLoading && !data.systems.length && <Text view={TEXT_VIEW.p20}>Нет созданных систем</Text>}

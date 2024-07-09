@@ -10,6 +10,7 @@ import { getSystemTest } from '@/api/services/systems';
 import Button from '@/components/Button';
 import CheckBox from '@/components/CheckBox';
 import Input from '@/components/Input';
+import ResultTable from '@/components/ResultTable';
 import Text, { TEXT_VIEW } from '@/components/Text';
 import { HISTORIES, SYSTEMS } from '@/constants';
 import useUserStore from '@/store/userStore';
@@ -77,7 +78,7 @@ const Page: React.FC<SystemTestPageProps> = ({ params }) => {
     [currentQuestionNumber, testData.questions],
   );
 
-  // const handleNextQuestion = useCallback(() => setCurrentQuestionNumber((prev) => prev + 1), []);
+  const handleNextQuestion = useCallback(() => setCurrentQuestionNumber((prev) => prev + 1), []);
 
   const handleFinishClick = useCallback(() => {
     setCurrentQuestionNumber(testData.questions.length);
@@ -200,13 +201,19 @@ const Page: React.FC<SystemTestPageProps> = ({ params }) => {
               </div>
             )}
             <div className={cnSystemCreatePage('results')}>
-              <Text view={TEXT_VIEW.p18}>{testIsEnd ? 'Результаты тестирования' : 'Предварительные результаты'}</Text>
-              {!!testResults.length &&
-                testResults.map((result) => (
-                  <Text
-                    key={result.key}
-                  >{`${result.key.length > 18 ? `${result.key.slice(0, 16)}...` : result.key}: ${result.value.toFixed(2)}%`}</Text>
-                ))}
+              {
+                !!testResults.length && (
+                  <ResultTable
+                    title={testIsEnd ? 'Результаты тестирования' : 'Предварительные результаты'}
+                    results={testResults}
+                  />
+                )
+                // testResults.map((result) => (
+                //   <Text
+                //     key={result.key}
+                //   >{`${result.key.length > 18 ? `${result.key.slice(0, 16)}...` : result.key}: ${result.value.toFixed(2)}%`}</Text>
+                // ))}
+              }
               {!testResults.length && testIsEnd && (
                 <Text className={cnSystemCreatePage('error')}>Недостаточно данных для предоставления результатов!</Text>
               )}
@@ -222,9 +229,9 @@ const Page: React.FC<SystemTestPageProps> = ({ params }) => {
                 <Button className={cnSystemCreatePage('button-abort')} onClick={handleFinishClick}>
                   Завершить тестирование
                 </Button>
-                {/* <Button onClick={handleNextQuestion} className={cnSystemCreatePage('button-pass')}>
-              Пропустить вопрос
-            </Button> */}
+                <Button onClick={handleNextQuestion} className={cnSystemCreatePage('button-pass')}>
+                  Пропустить вопрос
+                </Button>
                 <Button
                   onClick={handleAccept(currentOption)}
                   disabled={!currentOption}

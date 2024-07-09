@@ -8,10 +8,12 @@ import CloseIcon from '@/icons/CloseIcon';
 import DotsIcon from '@/icons/DotsIcon';
 import DownloadIcon from '@/icons/DownloadIcon';
 import EditIcon from '@/icons/EditIcon';
+import StarIcon from '@/icons/StarIcon';
 import TrashIcon from '@/icons/TrashIcon';
 import defaultImage from '@/public/default-image.png';
 import { classname } from '@/utils/classname';
 import { imageUrl } from '@/utils/imageUrl';
+import { starCountNormilize } from '@/utils/starCountNormilize';
 
 import Button from '../Button';
 import Input from '../Input';
@@ -24,11 +26,15 @@ export type CardProps = {
   image?: string;
   title: ReactNode;
   subtitle: ReactNode;
+  stars: number;
+  canLike: boolean;
+  likeMap: Map<number, number>;
   onClick?: MouseEventHandler;
   modifiable?: boolean;
   onDeleteClick?: (id: number, password: string) => void;
   onEditClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
   onDownloadClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
+  onLikeMap?: ({ add, system_id }: { add: boolean; system_id: number }) => void;
 };
 
 const cnCard = classname(classes, 'card');
@@ -38,10 +44,14 @@ const Card: React.FC<CardProps> = ({
   id,
   image,
   title,
+  stars,
   subtitle,
+  canLike,
+  likeMap,
   modifiable,
   onClick,
   onDeleteClick,
+  onLikeMap,
   onEditClick,
   onDownloadClick,
 }: CardProps) => {
@@ -74,6 +84,14 @@ const Card: React.FC<CardProps> = ({
     [],
   );
 
+  const updateLikeHandle = useCallback(
+    (add: boolean) => (event: React.MouseEvent<HTMLDivElement>) => {
+      event.stopPropagation();
+      onLikeMap?.({ add, system_id: id });
+    },
+    [id, onLikeMap],
+  );
+
   return (
     <div className={cnCard() + ` ${className}`} onClick={onClick} id={String(id)}>
       <Image
@@ -95,6 +113,15 @@ const Card: React.FC<CardProps> = ({
         <Text tag={TEXT_TAG.span} view={TEXT_VIEW.p16} color="secondary" maxLines={3} className={cnCard('subtitle')}>
           {subtitle}
         </Text>
+      </div>
+      <div className={cnCard('stats')}>
+        <div
+          className={cnCard('star', { active: likeMap.has(id) && canLike, canLike })}
+          onClick={updateLikeHandle(!likeMap.has(id))}
+        >
+          <StarIcon width={20} height={20} className={cnCard('starIcon')} />
+          <Text tag={TEXT_TAG.span}>{starCountNormilize(stars)}</Text>
+        </div>
       </div>
       {modifiable && (
         <>

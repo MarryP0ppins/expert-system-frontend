@@ -1,21 +1,22 @@
 .card {
-  display: flex;
-  flex-direction: column;
-  max-width: 280px;
+  display: grid;
+  grid-template-rows: 280px 1fr auto;
+  justify-content: center;
+  max-width: 288px;
   height: auto;
   background-color: $card-bg;
   border-radius: $border-radius;
   overflow: hidden;
   cursor: pointer;
   position: relative;
-
+  margin: 4px;
   @include shadow-hover;
   transition:
     scale 200ms,
     box-shadow 200ms;
 
   &:hover {
-    scale: 1.01;
+    scale: 1.005;
   }
 
   &-image {
@@ -142,5 +143,44 @@
       background-color: $button-primary-bg-hover;
       color: #fff;
     }
+  }
+
+  &-stats {
+    border-top: 1px solid $border-color;
+    padding: $space-xxs $space-xs;
+  }
+
+  &-star {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+    background-color: $star-bg;
+    border-radius: 14px / 50%;
+    width: min-content;
+    padding: 4px 6px;
+    transition: all 0.2s;
+
+    &_canLike {
+      &:hover {
+        svg {
+          color: #ff0000;
+        }
+        background-color: #ffc9c9;
+      }
+    }
+
+    &_active {
+      svg {
+        color: #ff0000;
+      }
+      background-color: #ffc9c9;
+    }
+  }
+
+  &-starIcon {
+    transition: color 0.2s;
+    stroke: #ff0000;
+    color: transparent;
   }
 }

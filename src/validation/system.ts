@@ -14,6 +14,7 @@ export const systemValidation = z.object({
   name: z.string().max(128, 'Максимальная длина - 128'),
   private: z.boolean(),
   image_uri: z.string(),
+  stars: z.number(),
 });
 
 export const systemUpdateValidation = systemValidation
