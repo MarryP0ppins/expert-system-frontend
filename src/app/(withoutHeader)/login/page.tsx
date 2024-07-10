@@ -2,16 +2,18 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
+import { TQueryKey } from '@/api';
+import { getLikes } from '@/api/services/likes';
 import { loginUserResponse } from '@/api/services/user';
 import Button from '@/components/Button';
 import ErrorPopup from '@/components/ErrorPopup';
 import Input from '@/components/Input';
 import Text, { TEXT_VIEW } from '@/components/Text';
-import { USER } from '@/constants';
+import { LIKES, USER } from '@/constants';
 import useUserStore from '@/store/userStore';
 import { TUserLogin } from '@/types/user';
 import { classname } from '@/utils/classname';
@@ -38,7 +40,12 @@ const Page: React.FC = () => {
     mode: 'all',
   });
 
-  const { mutate, error, isPending } = useMutation({
+  const {
+    mutate,
+    data: userData,
+    error,
+    isPending,
+  } = useMutation({
     mutationKey: [USER.LOGIN],
     mutationFn: loginUserResponse,
     onSuccess: (user) => {
@@ -47,6 +54,19 @@ const Page: React.FC = () => {
     },
     gcTime: 0,
   });
+
+  const { data: likesData, isFetched } = useQuery({
+    queryKey: [LIKES.GET, { user: userData?.id }],
+    queryFn: (params: TQueryKey<{ user?: number }>) => getLikes(params.queryKey[1].user ?? -1),
+    enabled: !!userData,
+  });
+
+  useEffect(() => {
+    if (isFetched) {
+      const newMap = new Map(likesData?.map((like) => [like.system_id, like.id]));
+      setStates({ likes: newMap });
+    }
+  }, [isFetched, likesData, setStates]);
 
   const parseError = useMemo(() => error && errorParser(error), [error]);
 

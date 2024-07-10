@@ -1,6 +1,4 @@
-'use client';
-import React, { useCallback, useState } from 'react';
-import Popup from 'reactjs-popup';
+import React, { useId } from 'react';
 import moment from 'moment';
 import Link from 'next/link';
 
@@ -37,83 +35,81 @@ const HistoryCard: React.FC<CardProps> = ({
   started_at,
   finished_at,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const openPopup = useCallback(() => {
-    setIsOpen(true);
-  }, []);
-
-  const closePopup = useCallback(() => {
-    setIsOpen(false);
-  }, []);
+  const popoverId = useId();
 
   return (
-    <Popup
-      trigger={
-        <div className={cnCard() + ` ${className}`} id={String(id)}>
-          <div className={cnCard('info')}>
-            <Text
-              tag={TEXT_TAG.span}
-              view={TEXT_VIEW.p20}
-              weight={TEXT_WEIGHT.medium}
-              maxLines={4}
-              className={cnCard('title')}
-            >
-              {title}
-            </Text>
+    <>
+      <button
+        className={cnCard() + ` ${className}`}
+        id={String(id)}
+        popoverTarget={`history-result-popover-${popoverId}`}
+        type="button"
+      >
+        <Text
+          tag={TEXT_TAG.span}
+          view={TEXT_VIEW.p20}
+          weight={TEXT_WEIGHT.medium}
+          maxLines={4}
+          className={cnCard('title')}
+        >
+          {title}
+        </Text>
+        <Text tag={TEXT_TAG.span} view={TEXT_VIEW.p16} color="secondary" className={cnCard('subtitle')}>
+          {`Отвечено вопросов: ${answered_questions}`}
+        </Text>
+        <div>
+          <Text tag={TEXT_TAG.span} view={TEXT_VIEW.p16} color="secondary" className={cnCard('subtitle')}>
+            Время начала:
+          </Text>
+          <Text tag={TEXT_TAG.span} view={TEXT_VIEW.p16} color="secondary" className={cnCard('subtitle')}>
+            {moment(started_at).format('DD/MM/YYYY, hh:mm:ss')}
+          </Text>
+        </div>
+        <div>
+          <Text tag={TEXT_TAG.span} view={TEXT_VIEW.p16} color="secondary" className={cnCard('subtitle')}>
+            Время окончания:
+          </Text>
+          <Text tag={TEXT_TAG.span} view={TEXT_VIEW.p16} color="secondary" className={cnCard('subtitle')}>
+            {moment(finished_at).format('DD/MM/YYYY, hh:mm:ss')}
+          </Text>
+
+          <div>
             <Text tag={TEXT_TAG.span} view={TEXT_VIEW.p16} color="secondary" className={cnCard('subtitle')}>
-              {`Отвечено вопросов: ${answered_questions}`}
+              Результаты:
             </Text>
-            <div>
-              <Text tag={TEXT_TAG.span} view={TEXT_VIEW.p16} color="secondary" className={cnCard('subtitle')}>
-                Время начала:
+            {results.slice(0, 4).map((result, index) => (
+              <Text
+                key={index}
+                tag={TEXT_TAG.span}
+                view={TEXT_VIEW.p16}
+                maxLines={1}
+                color="secondary"
+                title={result.result}
+                className={cnCard('subtitle')}
+              >
+                {`${index + 1}. ${result.result}`}
               </Text>
-              <Text tag={TEXT_TAG.span} view={TEXT_VIEW.p16} color="secondary" className={cnCard('subtitle')}>
-                {moment(started_at).format('DD/MM/YYYY, hh:mm:ss')}
-              </Text>
-            </div>
-            <div>
-              <Text tag={TEXT_TAG.span} view={TEXT_VIEW.p16} color="secondary" className={cnCard('subtitle')}>
-                Время окончания:
-              </Text>
-              <Text tag={TEXT_TAG.span} view={TEXT_VIEW.p16} color="secondary" className={cnCard('subtitle')}>
-                {moment(finished_at).format('DD/MM/YYYY, hh:mm:ss')}
-              </Text>
-            </div>
-            <div>
-              <Text tag={TEXT_TAG.span} view={TEXT_VIEW.p16} color="secondary" className={cnCard('subtitle')}>
-                Результаты:
-              </Text>
-              {results.slice(0, 4).map((result, index) => (
-                <Text
-                  key={index}
-                  tag={TEXT_TAG.span}
-                  view={TEXT_VIEW.p16}
-                  maxLines={1}
-                  color="secondary"
-                  title={result.result}
-                  className={cnCard('subtitle')}
-                >
-                  {`${index + 1}. ${result.result}`}
-                </Text>
-              ))}
-            </div>
-            <Link href={`/system/${systemId}/test`} className={cnCard('repeatButton')}>
-              <Button>Пройти еще раз</Button>
-            </Link>
+            ))}
           </div>
         </div>
-      }
-      open={isOpen}
-      onClose={closePopup}
-      onOpen={openPopup}
-      modal
-      closeOnDocumentClick
-      repositionOnResize
-      closeOnEscape
-    >
-      <div className={cnCard('modal')}>
-        <CloseIcon className={cnCard('closeIcon')} onClick={closePopup} />
+        <Link href={`/system/${systemId}/test`} className={cnCard('repeatButton')}>
+          <Button>Пройти еще раз</Button>
+        </Link>
+      </button>
+
+      <dialog
+        id={`history-result-popover-${popoverId}`}
+        className={cnCard('modal')}
+        popover="auto"
+        aria-label="Результаты тестирования"
+      >
+        <button
+          popoverTarget={`history-result-popover-${popoverId}`}
+          popoverTargetAction="hide"
+          className={cnCard('closeIcon')}
+        >
+          <CloseIcon />
+        </button>
         <Text view={TEXT_VIEW.p20} weight={TEXT_WEIGHT.bold} className={cnCard('modal-text')}>
           {title}
         </Text>
@@ -121,8 +117,8 @@ const HistoryCard: React.FC<CardProps> = ({
           title="Полные результаты тестирования"
           results={results.map((result) => ({ key: result.result, value: result.percent }))}
         />
-      </div>
-    </Popup>
+      </dialog>
+    </>
   );
 };
 

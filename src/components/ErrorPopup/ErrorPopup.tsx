@@ -1,5 +1,6 @@
 import React from 'react';
 import Popup from 'reactjs-popup';
+// import Popup from 'reactjs-popup';
 import { PopupPosition } from 'reactjs-popup/dist/types';
 
 import ErrorIcon from '@/icons/ErrorIcon';
@@ -18,19 +19,44 @@ type ErrorPopupProps = {
 
 const cnPopup = classname(classes, 'errorPopup');
 
+// const ErrorPopup: React.FC<ErrorPopupProps> = ({ error }) => {
+//   const id = useId();
+
+//   return (
+//     <div className={cnPopup()}>
+//       <button
+//         id={`anchor-trigger-${id}`}
+//         popoverTarget={`anchor-popover-${id}`}
+//         className={cnPopup('trigger', { visible: !error })}
+//         type="button"
+//       >
+//         <ErrorIcon className={cnPopup('errorIcon')} />
+//       </button>
+
+//       <div id={`anchor-popover-${id}`} className={cnPopup('popover')} popover="auto">
+//         <Text className={cnPopup('text')}>{error}</Text>
+//       </div>
+//     </div>
+//   );
+// };
+
 const ErrorPopup: React.FC<ErrorPopupProps> = ({ error, position = 'top right', arrow = false, offsetY = 4 }) => {
   return (
     <>
       {error && (
         <Popup
-          trigger={<ErrorIcon className={cnPopup('errorIcon')} />}
+          trigger={
+            <button className={cnPopup('trigger', { visible: !error })} type="button">
+              <ErrorIcon className={cnPopup('errorIcon')} />
+            </button>
+          }
           on="hover"
           position={position}
           arrow={arrow}
           offsetY={offsetY}
           arrowStyle={{ color: '#d32f2f' }}
         >
-          <div className={cnPopup()}>
+          <div className={cnPopup('popover')}>
             <Text className={cnPopup('text')}>{error}</Text>
           </div>
         </Popup>

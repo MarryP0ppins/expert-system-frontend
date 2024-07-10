@@ -86,3 +86,12 @@
   -ms-user-select: none;
   user-select: none;
 }
+
+@mixin notbutton {
+  background: none;
+  color: inherit;
+  border: none;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+}

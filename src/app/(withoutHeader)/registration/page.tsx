@@ -27,7 +27,7 @@ const Page: React.FC = () => {
     clearErrors,
     getValues,
     formState: { errors },
-  } = useForm<TUserRegistration>({ resolver: zodResolver(userRegistrationValidation), mode: 'all' });
+  } = useForm<TUserRegistration>({ resolver: zodResolver(userRegistrationValidation), mode: 'onBlur' });
 
   const { mutate, error, isPending, isSuccess } = useMutation({
     mutationKey: [USER.REGISTRATION],
@@ -68,6 +68,7 @@ const Page: React.FC = () => {
             {...register('username')}
             className={cnRegistrationPage('input')}
             placeholder="Никнейм"
+            autoComplete="name"
             label={formWatch.username?.length ? 'Никнейм' : undefined}
             afterSlot={<ErrorPopup error={errors.username?.message} />}
             error={!!errors.username}
@@ -76,6 +77,7 @@ const Page: React.FC = () => {
             {...register('email')}
             className={cnRegistrationPage('input')}
             placeholder="Почта"
+            autoComplete="email"
             label={formWatch.email?.length ? 'Почта' : undefined}
             afterSlot={<ErrorPopup error={errors.email?.message} />}
             error={!!errors.email}

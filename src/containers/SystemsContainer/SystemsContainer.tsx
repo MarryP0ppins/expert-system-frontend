@@ -144,7 +144,7 @@ const SystemsContainer: React.FC = () => {
     },
     [likeMap, starAddMutation, starRemoveMutation, user],
   );
-  console.log(likeMap);
+
   return (
     <div className={cnSystemsContainer()}>
       {!!data?.systems.length &&

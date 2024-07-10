@@ -1,6 +1,8 @@
 .not-found {
   width: 340px;
   margin: 24px;
+  text-align: justify;
+
   &-404 {
     font-size: 120px;
     line-height: normal;
@@ -8,7 +10,7 @@
     margin: 20px;
     text-align: center;
   }
-  text-align: justify;
+
   &-button-back {
     color: $brand;
     font-weight: 500;
