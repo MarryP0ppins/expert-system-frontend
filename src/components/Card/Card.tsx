@@ -1,13 +1,15 @@
 'use client';
-import React, { ChangeEvent, MouseEventHandler, ReactNode, useCallback, useState } from 'react';
+import React, { ChangeEvent, MouseEventHandler, ReactNode, useCallback, useId, useState } from 'react';
 import Popup from 'reactjs-popup';
 import Image from 'next/image';
+import Link from 'next/link';
 
 import Text, { TEXT_TAG, TEXT_VIEW, TEXT_WEIGHT } from '@/components/Text';
 import CloseIcon from '@/icons/CloseIcon';
 import DotsIcon from '@/icons/DotsIcon';
 import DownloadIcon from '@/icons/DownloadIcon';
 import EditIcon from '@/icons/EditIcon';
+import InfoIcon from '@/icons/InfoIcon';
 import StarIcon from '@/icons/StarIcon';
 import TrashIcon from '@/icons/TrashIcon';
 import defaultImage from '@/public/default-image.png';
@@ -29,10 +31,9 @@ export type CardProps = {
   stars: number;
   canLike: boolean;
   likeMap: Map<number, number>;
+  userPageOption?: boolean;
   onClick?: MouseEventHandler;
-  modifiable?: boolean;
   onDeleteClick?: (id: number, password: string) => void;
-  onEditClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
   onDownloadClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
   onLikeMap?: ({ add, system_id }: { add: boolean; system_id: number }) => void;
 };
@@ -48,23 +49,21 @@ const Card: React.FC<CardProps> = ({
   subtitle,
   canLike,
   likeMap,
-  modifiable,
+  userPageOption = false,
   onClick,
   onDeleteClick,
   onLikeMap,
-  onEditClick,
   onDownloadClick,
 }: CardProps) => {
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const systemUnicId = useId();
+
   const [isOptionOpen, setIsOptionOpen] = useState(false);
   const [isError, setIsError] = useState(false);
   const [password, setPassword] = useState('');
 
-  const closeDeletePopup = useCallback(() => {
-    setIsDeleteOpen(false);
+  const resetPassword = useCallback(() => {
     setPassword('');
   }, []);
-  const openDeletePopup = useCallback(() => setIsDeleteOpen(true), []);
 
   const closeOptionPopup = useCallback(() => setIsOptionOpen(false), []);
   const openOptionPopup = useCallback(() => setIsOptionOpen(true), []);
@@ -74,9 +73,9 @@ const Card: React.FC<CardProps> = ({
     (event: React.MouseEvent<HTMLButtonElement>) => {
       event.stopPropagation();
       onDeleteClick?.(id, password);
-      closeDeletePopup();
+      resetPassword();
     },
-    [closeDeletePopup, id, onDeleteClick, password],
+    [resetPassword, id, onDeleteClick, password],
   );
 
   const onInputChange = useCallback(
@@ -92,8 +91,9 @@ const Card: React.FC<CardProps> = ({
     [id, onLikeMap],
   );
 
+  const stopPropagation = useCallback((event: React.MouseEvent<HTMLElement>) => event.stopPropagation(), []);
   return (
-    <div className={cnCard() + ` ${className}`} onClick={onClick} id={String(id)}>
+    <div className={cnCard() + ` ${className}`} onClick={onClick}>
       <Image
         alt="logo"
         src={isError || !image ? defaultImage : imageUrl(image)}
@@ -123,65 +123,92 @@ const Card: React.FC<CardProps> = ({
           <Text tag={TEXT_TAG.span}>{starCountNormilize(stars)}</Text>
         </div>
       </div>
-      {modifiable && (
+      {userPageOption && (
         <>
-          <Popup
-            trigger={<TrashIcon width={32} height={32} className={cnCard('deleteIcon')} />}
-            open={isDeleteOpen}
-            onClose={closeDeletePopup}
-            onOpen={openDeletePopup}
-            modal
-            closeOnDocumentClick
-            repositionOnResize
-            closeOnEscape
+          <button
+            popoverTarget={`delete-system-popover-${systemUnicId}`}
+            className={cnCard('deleteIcon')}
+            type="button"
+            onClick={stopPropagation}
           >
-            <div className={cnCard('modal')}>
-              <CloseIcon className={cnCard('closeIcon')} onClick={closeDeletePopup} />
-              <Text view={TEXT_VIEW.p20} weight={TEXT_WEIGHT.bold} className={cnCard('modal-text')}>
-                Подтверждение удаления
-              </Text>
-              <Text view={TEXT_VIEW.p16} className={cnCard('modal-text')}>
-                {`Для подтверждения удаления Вам необходимо ввести пароль от вашей учетной записи.`}
-              </Text>
-              <Input
-                value={password}
-                onChange={onInputChange}
-                className={cnCard('input', { modal: true })}
-                required
-                placeholder={'введите пароль'}
-                autoComplete="password"
-                type="password"
-              />
-              <Button className={cnCard('button')} onClick={handleDelete}>
-                Удалить систему
-              </Button>
-            </div>
-          </Popup>
-          <Popup
-            open={isOptionOpen}
-            trigger={<DotsIcon width={32} height={32} className={cnCard('dotsIcon', { active: isOptionOpen })} />}
-            position="bottom left"
-            repositionOnResize
-            onClose={closeOptionPopup}
-            onOpen={openOptionPopup}
+            <TrashIcon width={24} height={24} />
+          </button>
+
+          <dialog
+            id={`delete-system-popover-${systemUnicId}`}
+            popover="auto"
+            aria-label="Подтверждение удаления"
+            className={cnCard('modal')}
+            onClick={stopPropagation}
           >
-            <div className={cnCard('popup')} onClick={closeOptionPopup}>
-              <div className={cnCard('options')} onClick={onEditClick}>
+            <button
+              popoverTarget={`delete-system-popover-${systemUnicId}`}
+              popoverTargetAction="hide"
+              className={cnCard('closeIcon')}
+              onClick={resetPassword}
+              type="button"
+            >
+              <CloseIcon />
+            </button>
+            <Text view={TEXT_VIEW.p20} weight={TEXT_WEIGHT.bold} className={cnCard('modal-text')}>
+              Подтверждение удаления
+            </Text>
+            <Text view={TEXT_VIEW.p16} className={cnCard('modal-text')}>
+              {`Для подтверждения удаления Вам необходимо ввести пароль от вашей учетной записи.`}
+            </Text>
+            <Input
+              value={password}
+              onChange={onInputChange}
+              className={cnCard('input', { modal: true })}
+              required
+              placeholder={'введите пароль'}
+              autoComplete="password"
+              type="password"
+            />
+            <Button
+              className={cnCard('button')}
+              onClick={handleDelete}
+              popoverTarget={`delete-system-popover-${systemUnicId}`}
+              popoverTargetAction="hide"
+            >
+              Удалить систему
+            </Button>
+          </dialog>
+        </>
+      )}
+      <Popup
+        open={isOptionOpen}
+        trigger={<DotsIcon width={32} height={32} className={cnCard('dotsIcon', { active: isOptionOpen })} />}
+        position="bottom left"
+        repositionOnResize
+        onClose={closeOptionPopup}
+        onOpen={openOptionPopup}
+      >
+        <div className={cnCard('popup')} onClick={closeOptionPopup}>
+          <Link href={`/system/${id}/about`} className={cnCard('options')}>
+            <InfoIcon />
+            <Text tag={TEXT_TAG.span} view={TEXT_VIEW.p18}>
+              О системе
+            </Text>
+          </Link>
+          {userPageOption && (
+            <>
+              <Link href={`/system/${id}/editor/system`} className={cnCard('options')}>
                 <EditIcon />
                 <Text tag={TEXT_TAG.span} view={TEXT_VIEW.p18}>
                   Редактировать
                 </Text>
-              </div>
+              </Link>
               <div className={cnCard('options')} onClick={onDownloadClick}>
                 <DownloadIcon />
                 <Text tag={TEXT_TAG.span} view={TEXT_VIEW.p18}>
                   Скачать копию
                 </Text>
               </div>
-            </div>
-          </Popup>
-        </>
-      )}
+            </>
+          )}
+        </div>
+      </Popup>
     </div>
   );
 };

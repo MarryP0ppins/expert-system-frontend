@@ -21,8 +21,8 @@ export const getSystems = async (params?: TSystemRequestParams): Promise<TSystem
   };
 };
 
-export const getSystemOne = async (system_id: number): Promise<TSystem> => {
-  const { data } = await getApiRequest<TSystem>(`/systems/${system_id}`);
+export const getSystemOne = async (system_id: number, cookie?: string): Promise<TSystem> => {
+  const { data } = await getApiRequest<TSystem>(`/systems/${system_id}`, { headers: { Cookie: cookie } });
 
   return data;
 };
