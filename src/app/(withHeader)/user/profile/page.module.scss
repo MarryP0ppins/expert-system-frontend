@@ -38,16 +38,24 @@
   &-modal {
     position: relative;
     padding: $space-xl;
-    margin: $space-l;
     border-radius: 12px;
-    display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 24px;
     background-color: #fff;
     max-width: 400px;
+    overflow: visible;
     @include shadow;
+
+    &[open] {
+      display: flex;
+      border: 0;
+    }
+
+    &::backdrop {
+      background-color: rgb(255 255 255 / 0.5);
+    }
 
     &-text {
       margin: 0;

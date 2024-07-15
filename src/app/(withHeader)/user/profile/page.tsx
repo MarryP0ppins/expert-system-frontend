@@ -1,7 +1,6 @@
 'use client';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import Popup from 'reactjs-popup';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
@@ -19,6 +18,7 @@ import useUserStore from '@/store/userStore';
 import { TUserUpdate } from '@/types/user';
 import { classname } from '@/utils/classname';
 import { errorParser } from '@/utils/errorParser';
+import { useDialogController } from '@/utils/useDialogController';
 import { userUpdateValidation } from '@/validation/user';
 
 import classes from './page.module.scss';
@@ -26,20 +26,10 @@ import classes from './page.module.scss';
 const cnProfile = classname(classes, 'profile');
 
 const Page: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const closePopup = useCallback(() => setIsOpen(false), []);
-  const openPopup = useCallback(() => setIsOpen(true), []);
+  const [formWatch, setformWatch] = useState<Partial<TUserUpdate>>();
 
   const { user, setStates } = useUserStore(useShallow((store) => ({ user: store.user, setStates: store.setStates })));
-
-  const { mutate, error, isPending } = useMutation({
-    mutationKey: [USER.PATCH],
-    mutationFn: updateUserResponse,
-    onSuccess: (user) => setStates({ user }),
-    gcTime: 0,
-  });
-
-  const parseError = useMemo(() => error && errorParser(error), [error]);
+  const { dialogRef, openDialog, closeDialog } = useDialogController();
 
   const {
     register,
@@ -47,7 +37,7 @@ const Page: React.FC = () => {
     watch,
     handleSubmit,
     reset,
-    resetField,
+    trigger,
     formState: { dirtyFields, errors, isValid },
     clearErrors,
   } = useForm<TUserUpdate>({
@@ -56,8 +46,20 @@ const Page: React.FC = () => {
     mode: 'all',
   });
 
+  const { mutate, error, isPending } = useMutation({
+    mutationKey: [USER.PATCH],
+    mutationFn: updateUserResponse,
+    onSuccess: (user) => {
+      setStates({ user });
+      reset({ ...user, new_password: '' });
+    },
+    gcTime: 0,
+  });
+
+  const parseError = useMemo(() => error && errorParser(error), [error]);
+
   const handleFormSubmit = useCallback(() => {
-    closePopup();
+    closeDialog();
     const data = getValues();
 
     type formType = keyof TUserUpdate;
@@ -72,28 +74,29 @@ const Page: React.FC = () => {
     }, {} as TUserUpdate);
 
     mutate(changedFields);
-    resetField('password');
-    resetField('new_password');
-  }, [closePopup, dirtyFields, getValues, resetField, mutate]);
+    reset({ password: '', new_password: '' });
+  }, [closeDialog, getValues, dirtyFields, mutate, reset]);
 
-  const formWatch = watch();
-
+  // временное решение. Не обнавляется стейт формы.
   useEffect(() => {
-    reset({ ...user, new_password: '' });
+    const subscription = watch((value, { name }) => {
+      setformWatch(value);
+      trigger(name);
+    });
     return () => {
+      subscription.unsubscribe();
       clearErrors();
     };
-  }, [clearErrors, reset, user]);
+  }, [clearErrors, trigger, watch]);
 
   return (
     <div className={cnProfile()}>
-      <form className={cnProfile('form')} autoComplete="off">
+      <form className={cnProfile('form')}>
         <div className={cnProfile('line')}>
           <Input
             {...register('first_name')}
             className={cnProfile('input')}
-            autoComplete="off"
-            label={formWatch.first_name?.length ? 'Имя' : undefined}
+            label={formWatch?.first_name?.length ? 'Имя' : undefined}
             placeholder="Имя"
             afterSlot={<ErrorPopup error={errors.first_name?.message} />}
             error={!!errors.first_name}
@@ -101,7 +104,7 @@ const Page: React.FC = () => {
           <Input
             {...register('last_name')}
             className={cnProfile('input')}
-            label={formWatch.last_name?.length ? 'Фамилия' : undefined}
+            label={formWatch?.last_name?.length ? 'Фамилия' : undefined}
             placeholder="Фамилия"
             afterSlot={<ErrorPopup error={errors.last_name?.message} />}
             error={!!errors.last_name}
@@ -110,14 +113,14 @@ const Page: React.FC = () => {
         <Input
           {...register('username')}
           className={cnProfile('input')}
-          label={formWatch.username?.length ? 'Никнейм' : undefined}
+          label={formWatch?.username?.length ? 'Никнейм' : undefined}
           placeholder="Никнейм"
           disabled
         />
         <Input
           {...register('email')}
           className={cnProfile('input')}
-          label={formWatch.email?.length ? 'Почта' : undefined}
+          label={formWatch?.email?.length ? 'Почта' : undefined}
           placeholder="Почта"
           type="email"
           afterSlot={<ErrorPopup error={errors.email?.message} />}
@@ -126,7 +129,7 @@ const Page: React.FC = () => {
         <Input
           {...register('new_password')}
           className={cnProfile('input')}
-          label={formWatch.new_password?.length ? 'Пароль' : undefined}
+          label={formWatch?.new_password?.length ? 'Пароль' : undefined}
           placeholder="Новый пароль"
           autoComplete="new-password"
           type="password"
@@ -138,50 +141,39 @@ const Page: React.FC = () => {
             {parseError.extra ?? parseError.error}
           </Text>
         )}
-        <Popup
-          trigger={
-            <Button
-              className={cnProfile('button')}
-              type="button"
-              disabled={!Object.keys(dirtyFields).length || !isValid}
-              loading={isPending}
-            >
-              Сохранить изменения
-            </Button>
-          }
-          open={isOpen}
-          onClose={closePopup}
-          onOpen={openPopup}
-          modal
-          closeOnDocumentClick
-          repositionOnResize
-          closeOnEscape
+        <Button
+          className={cnProfile('button')}
+          type="button"
+          disabled={!Object.keys(dirtyFields).length || !isValid}
+          loading={isPending}
+          onClick={openDialog}
         >
-          <div className={cnProfile('modal')}>
-            <CloseIcon className={cnProfile('closeIcon')} onClick={closePopup} />
-            <Text view={TEXT_VIEW.p20} weight={TEXT_WEIGHT.bold} className={cnProfile('modal-text')}>
-              Подтверждение действий
-            </Text>
-            <Text view={TEXT_VIEW.p16} className={cnProfile('modal-text')}>
-              {`Для подтверждения действия Вам необходимо ввести ${dirtyFields.new_password ? 'старый' : ''} пароль от вашей учетной записи.`}
-            </Text>
-            <Input
-              {...register('password')}
-              className={cnProfile('input', { modal: true })}
-              required
-              placeholder={dirtyFields.new_password ? 'введите старый пароль' : 'введите пароль'}
-              autoComplete="new-password"
-              type="password"
-            />
-            <Button
-              className={cnProfile('button')}
-              onClick={handleSubmit(handleFormSubmit)}
-              disabled={!formWatch.password?.length}
-            >
-              Подтвердить
-            </Button>
-          </div>
-        </Popup>
+          Сохранить изменения
+        </Button>
+        <dialog className={cnProfile('modal')} ref={dialogRef}>
+          <CloseIcon onClick={closeDialog} className={cnProfile('closeIcon')} />
+          <Text view={TEXT_VIEW.p20} weight={TEXT_WEIGHT.bold} className={cnProfile('modal-text')}>
+            Подтверждение действий
+          </Text>
+          <Text view={TEXT_VIEW.p16} className={cnProfile('modal-text')}>
+            {`Для подтверждения действия Вам необходимо ввести ${dirtyFields.new_password ? 'старый' : ''} пароль от вашей учетной записи.`}
+          </Text>
+          <Input
+            {...register('password')}
+            className={cnProfile('input', { modal: true })}
+            required
+            placeholder={dirtyFields.new_password ? 'введите старый пароль' : 'введите пароль'}
+            autoComplete="new-password"
+            type="password"
+          />
+          <Button
+            className={cnProfile('button')}
+            onClick={handleSubmit(handleFormSubmit)}
+            disabled={!formWatch?.password?.length}
+          >
+            Подтвердить
+          </Button>
+        </dialog>
       </form>
     </div>
   );

@@ -29,7 +29,7 @@ const Page: React.FC<SystemAboutPageProps> = async ({ params }) => {
     notFound();
   }
 
-  const data = await getSystemOne(system_id, `${cookie.name}=${cookie.value}`);
+  const data = await getSystemOne(system_id, { headers: { Cookie: `${cookie.name}=${cookie.value}` } });
 
   return (
     <div className={cnAboutPage()}>

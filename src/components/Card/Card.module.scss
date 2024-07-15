@@ -38,7 +38,6 @@
   }
 
   &-deleteIcon {
-    @include notbutton;
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -79,9 +78,10 @@
     background-color: #fff;
     max-width: 400px;
     overflow: visible;
+    cursor: default;
     @include shadow;
 
-    &:popover-open {
+    &[open] {
       display: flex;
       border: 0;
     }
@@ -97,7 +97,6 @@
   }
 
   &-closeIcon {
-    @include notbutton;
     position: absolute;
     width: 36px;
     height: 36px;

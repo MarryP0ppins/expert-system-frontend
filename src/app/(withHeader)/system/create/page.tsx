@@ -1,5 +1,5 @@
 'use client';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
@@ -29,11 +29,14 @@ const cnSystemCreatePage = classname(classes, 'systemCreatePage');
 const Page: React.FC = () => {
   const router = useRouter();
   const user = useUserStore((store) => store.user);
+  const [formWatch, setformWatch] = useState<Partial<TSystemNew>>();
+
   const {
     register,
     handleSubmit,
     watch,
     clearErrors,
+    trigger,
     formState: { errors, isValid },
   } = useForm<TSystemNew>({
     defaultValues: { private: true },
@@ -43,7 +46,7 @@ const Page: React.FC = () => {
 
   const queryClient = getQueryClient();
 
-  const { mutate, isPending, error, status, data } = useMutation<TSystem, TErrorResponse, TSystemNew>({
+  const { mutate, isPending, error } = useMutation<TSystem, TErrorResponse, TSystemNew>({
     mutationFn: createSystem,
     onSuccess: (data) => {
       queryClient.setQueryData([SYSTEMS.RETRIEVE, { system: data.id }], data);
@@ -60,6 +63,7 @@ const Page: React.FC = () => {
           }),
         );
       }
+      router.push(`/system/${data?.id}/editor`);
     },
   });
 
@@ -67,20 +71,17 @@ const Page: React.FC = () => {
 
   const handleFormSubmit = useCallback((data: TSystemNew) => mutate(data), [mutate]);
 
-  const formWatch = watch();
-
+  // временное решение. Не обнавляется стейт формы.
   useEffect(() => {
-    if (status === 'success') {
-      router.push(`/system/${data?.id}/editor`);
-    }
-  }, [data, isPending, router, status]);
-
-  useEffect(
-    () => () => {
+    const subscription = watch((value, { name }) => {
+      setformWatch(value);
+      trigger(name);
+    });
+    return () => {
+      subscription.unsubscribe();
       clearErrors();
-    },
-    [clearErrors],
-  );
+    };
+  }, [clearErrors, trigger, watch]);
 
   return (
     <div className={cnSystemCreatePage()}>
@@ -94,7 +95,7 @@ const Page: React.FC = () => {
           <Input
             {...register('name')}
             placeholder="Название системы"
-            label={formWatch.name?.length ? 'Название ситемы' : undefined}
+            label={formWatch?.name?.length ? 'Название ситемы' : undefined}
             error={!!errors.name}
             afterSlot={<ErrorPopup error={errors.name?.message} />}
             className={cnSystemCreatePage('input')}
@@ -103,7 +104,7 @@ const Page: React.FC = () => {
             <div className={cnSystemCreatePage('column')}>
               <FileUpload {...register('image')} accept="image/*" />
               <div className={cnSystemCreatePage('checkbox')}>
-                <CheckBox {...register('private')} checked={formWatch.private} />
+                <CheckBox {...register('private')} />
                 <Text view={TEXT_VIEW.p18} className={cnSystemCreatePage('checkbox-label')}>
                   Приватная
                 </Text>
@@ -113,7 +114,7 @@ const Page: React.FC = () => {
               {...register('about')}
               className={cnSystemCreatePage('about')}
               placeholder="Описание системы"
-              label={!!formWatch.about?.length && 'Описание системы'}
+              label={!!formWatch?.about?.length && 'Описание системы'}
               error={!!errors.about}
               afterSlot={<ErrorPopup error={errors.about?.message} />}
             />

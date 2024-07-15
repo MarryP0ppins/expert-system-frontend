@@ -1,3 +1,5 @@
+import { AxiosRequestConfig } from 'axios';
+
 import {
   TSystem,
   TSystemDeleteResponseParams,
@@ -21,8 +23,8 @@ export const getSystems = async (params?: TSystemRequestParams): Promise<TSystem
   };
 };
 
-export const getSystemOne = async (system_id: number, cookie?: string): Promise<TSystem> => {
-  const { data } = await getApiRequest<TSystem>(`/systems/${system_id}`, { headers: { Cookie: cookie } });
+export const getSystemOne = async (system_id: number, config?: AxiosRequestConfig): Promise<TSystem> => {
+  const { data } = await getApiRequest<TSystem>(`/systems/${system_id}`, config);
 
   return data;
 };

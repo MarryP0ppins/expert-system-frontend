@@ -1,4 +1,4 @@
-import React, { useId } from 'react';
+import React from 'react';
 import moment from 'moment';
 import Link from 'next/link';
 
@@ -6,6 +6,7 @@ import Text, { TEXT_TAG, TEXT_VIEW, TEXT_WEIGHT } from '@/components/Text';
 import CloseIcon from '@/icons/CloseIcon';
 import { THistoryResult } from '@/types/history';
 import { classname } from '@/utils/classname';
+import { useDialogController } from '@/utils/useDialogController';
 
 import Button from '../Button';
 import ResultTable from '../ResultTable';
@@ -35,16 +36,11 @@ const HistoryCard: React.FC<CardProps> = ({
   started_at,
   finished_at,
 }) => {
-  const popoverId = useId();
+  const { dialogRef, openDialog, closeDialog } = useDialogController();
 
   return (
     <>
-      <button
-        className={cnCard() + ` ${className}`}
-        id={String(id)}
-        popoverTarget={`history-result-popover-${popoverId}`}
-        type="button"
-      >
+      <div className={cnCard() + ` ${className}`} id={String(id)} onClick={openDialog}>
         <Text
           tag={TEXT_TAG.span}
           view={TEXT_VIEW.p20}
@@ -95,21 +91,10 @@ const HistoryCard: React.FC<CardProps> = ({
         <Link href={`/system/${systemId}/test`} className={cnCard('repeatButton')}>
           <Button>Пройти еще раз</Button>
         </Link>
-      </button>
+      </div>
 
-      <dialog
-        id={`history-result-popover-${popoverId}`}
-        className={cnCard('modal')}
-        popover="auto"
-        aria-label="Результаты тестирования"
-      >
-        <button
-          popoverTarget={`history-result-popover-${popoverId}`}
-          popoverTargetAction="hide"
-          className={cnCard('closeIcon')}
-        >
-          <CloseIcon />
-        </button>
+      <dialog className={cnCard('modal')} aria-label="Результаты тестирования" ref={dialogRef}>
+        <CloseIcon className={cnCard('closeIcon')} onClick={closeDialog} />
         <Text view={TEXT_VIEW.p20} weight={TEXT_WEIGHT.bold} className={cnCard('modal-text')}>
           {title}
         </Text>

@@ -52,7 +52,7 @@ export enum LIKES {
   GET = 'likes-get',
 }
 
-export const RUS_LETTERS_ONLY = new RegExp(/[а-яА-Я]/);
+export const RUS_LETTERS_ONLY = new RegExp(/^[а-яА-Я]+$/);
 
 export enum OPERATOR {
   EQUAL = 'Equal',

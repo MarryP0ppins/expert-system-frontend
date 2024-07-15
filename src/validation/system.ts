@@ -20,6 +20,7 @@ export const systemValidation = z.object({
 export const systemUpdateValidation = systemValidation
   .pick({ about: true, name: true, private: true })
   .extend({
+    //private: z.string().transform((flag) => !!flag),
     image: z
       .custom<FileList>()
       .optional()

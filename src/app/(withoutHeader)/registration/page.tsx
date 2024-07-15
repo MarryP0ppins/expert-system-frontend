@@ -1,5 +1,5 @@
 'use client';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
@@ -20,14 +20,17 @@ import classes from './page.module.scss';
 const cnRegistrationPage = classname(classes, 'registrationPage');
 
 const Page: React.FC = () => {
+  const [formWatch, setFormWatch] = useState<Partial<TUserRegistration>>();
+
   const {
     register,
     handleSubmit,
     watch,
     clearErrors,
     getValues,
+    trigger,
     formState: { errors },
-  } = useForm<TUserRegistration>({ resolver: zodResolver(userRegistrationValidation), mode: 'onBlur' });
+  } = useForm<TUserRegistration>({ resolver: zodResolver(userRegistrationValidation), mode: 'all' });
 
   const { mutate, error, isPending, isSuccess } = useMutation({
     mutationKey: [USER.REGISTRATION],
@@ -44,14 +47,21 @@ const Page: React.FC = () => {
     [mutate],
   );
 
-  const formWatch = watch();
-
   useEffect(
     () => () => {
       clearErrors();
     },
     [clearErrors],
   );
+
+  // временное решение. Не обнавляется стейт формы.
+  useEffect(() => {
+    const subscription = watch((value, { name }) => {
+      setFormWatch(value);
+      trigger(name);
+    });
+    return () => subscription.unsubscribe();
+  }, [trigger, watch]);
 
   return (
     <main className={cnRegistrationPage('wrapper')}>
@@ -69,7 +79,7 @@ const Page: React.FC = () => {
             className={cnRegistrationPage('input')}
             placeholder="Никнейм"
             autoComplete="name"
-            label={formWatch.username?.length ? 'Никнейм' : undefined}
+            label={formWatch?.username?.length ? 'Никнейм' : undefined}
             afterSlot={<ErrorPopup error={errors.username?.message} />}
             error={!!errors.username}
           />
@@ -78,7 +88,7 @@ const Page: React.FC = () => {
             className={cnRegistrationPage('input')}
             placeholder="Почта"
             autoComplete="email"
-            label={formWatch.email?.length ? 'Почта' : undefined}
+            label={formWatch?.email?.length ? 'Почта' : undefined}
             afterSlot={<ErrorPopup error={errors.email?.message} />}
             error={!!errors.email}
           />
@@ -86,7 +96,7 @@ const Page: React.FC = () => {
             {...register('first_name')}
             className={cnRegistrationPage('input')}
             placeholder="Имя"
-            label={formWatch.first_name?.length ? 'Имя' : undefined}
+            label={formWatch?.first_name?.length ? 'Имя' : undefined}
             afterSlot={<ErrorPopup error={errors.first_name?.message} />}
             error={!!errors.first_name}
           />
@@ -94,7 +104,7 @@ const Page: React.FC = () => {
             {...register('last_name')}
             className={cnRegistrationPage('input')}
             placeholder="Фамилия"
-            label={formWatch.last_name?.length ? 'Фамилия' : undefined}
+            label={formWatch?.last_name?.length ? 'Фамилия' : undefined}
             afterSlot={<ErrorPopup error={errors.last_name?.message} />}
             error={!!errors.last_name}
           />
@@ -102,7 +112,7 @@ const Page: React.FC = () => {
             {...register('password')}
             className={cnRegistrationPage('input')}
             placeholder="Пароль"
-            label={formWatch.password?.length ? 'Пароль' : undefined}
+            label={formWatch?.password?.length ? 'Пароль' : undefined}
             afterSlot={<ErrorPopup error={errors.password?.message} />}
             type="password"
             error={!!errors.password}
@@ -111,7 +121,7 @@ const Page: React.FC = () => {
             {...register('password_submit')}
             className={cnRegistrationPage('input')}
             placeholder="Подтвердите пароль"
-            label={formWatch.password_submit?.length ? 'Подтвердите пароль' : undefined}
+            label={formWatch?.password_submit?.length ? 'Подтвердите пароль' : undefined}
             afterSlot={<ErrorPopup error={errors.password_submit?.message} />}
             type="password"
             error={!!errors.password_submit}

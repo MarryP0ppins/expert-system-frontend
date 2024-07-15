@@ -1,5 +1,5 @@
 'use client';
-import React, { ChangeEvent, MouseEventHandler, ReactNode, useCallback, useId, useState } from 'react';
+import React, { ChangeEvent, MouseEventHandler, ReactNode, useCallback, useState } from 'react';
 import Popup from 'reactjs-popup';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -16,6 +16,7 @@ import defaultImage from '@/public/default-image.png';
 import { classname } from '@/utils/classname';
 import { imageUrl } from '@/utils/imageUrl';
 import { starCountNormilize } from '@/utils/starCountNormilize';
+import { useDialogController } from '@/utils/useDialogController';
 
 import Button from '../Button';
 import Input from '../Input';
@@ -55,15 +56,15 @@ const Card: React.FC<CardProps> = ({
   onLikeMap,
   onDownloadClick,
 }: CardProps) => {
-  const systemUnicId = useId();
-
+  const { dialogRef, openDialog, closeDialog } = useDialogController();
   const [isOptionOpen, setIsOptionOpen] = useState(false);
   const [isError, setIsError] = useState(false);
   const [password, setPassword] = useState('');
 
   const resetPassword = useCallback(() => {
     setPassword('');
-  }, []);
+    closeDialog();
+  }, [closeDialog]);
 
   const closeOptionPopup = useCallback(() => setIsOptionOpen(false), []);
   const openOptionPopup = useCallback(() => setIsOptionOpen(true), []);
@@ -75,7 +76,7 @@ const Card: React.FC<CardProps> = ({
       onDeleteClick?.(id, password);
       resetPassword();
     },
-    [resetPassword, id, onDeleteClick, password],
+    [onDeleteClick, id, password, resetPassword],
   );
 
   const onInputChange = useCallback(
@@ -125,31 +126,15 @@ const Card: React.FC<CardProps> = ({
       </div>
       {userPageOption && (
         <>
-          <button
-            popoverTarget={`delete-system-popover-${systemUnicId}`}
-            className={cnCard('deleteIcon')}
-            type="button"
-            onClick={stopPropagation}
-          >
-            <TrashIcon width={24} height={24} />
-          </button>
-
+          <TrashIcon width={24} height={24} onClick={openDialog} className={cnCard('deleteIcon')} />
           <dialog
-            id={`delete-system-popover-${systemUnicId}`}
-            popover="auto"
             aria-label="Подтверждение удаления"
             className={cnCard('modal')}
+            ref={dialogRef}
             onClick={stopPropagation}
           >
-            <button
-              popoverTarget={`delete-system-popover-${systemUnicId}`}
-              popoverTargetAction="hide"
-              className={cnCard('closeIcon')}
-              onClick={resetPassword}
-              type="button"
-            >
-              <CloseIcon />
-            </button>
+            <CloseIcon className={cnCard('closeIcon')} onClick={resetPassword} />
+
             <Text view={TEXT_VIEW.p20} weight={TEXT_WEIGHT.bold} className={cnCard('modal-text')}>
               Подтверждение удаления
             </Text>
@@ -165,12 +150,7 @@ const Card: React.FC<CardProps> = ({
               autoComplete="password"
               type="password"
             />
-            <Button
-              className={cnCard('button')}
-              onClick={handleDelete}
-              popoverTarget={`delete-system-popover-${systemUnicId}`}
-              popoverTargetAction="hide"
-            >
+            <Button className={cnCard('button')} onClick={handleDelete}>
               Удалить систему
             </Button>
           </dialog>

@@ -1,5 +1,5 @@
 'use client';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query';
@@ -35,6 +35,7 @@ type PageProps = {
 const Page: React.FC<PageProps> = ({ params }) => {
   const queryClient = getQueryClient();
   const user = useUserStore((store) => store.user);
+  const [formWatch, setformWatch] = useState<Partial<TSystemUpdateBefore>>();
 
   const system_id = useMemo(() => Number(params.system_id) ?? -1, [params]);
 
@@ -62,11 +63,7 @@ const Page: React.FC<PageProps> = ({ params }) => {
     enabled: !!data.image_uri,
   });
 
-  const { mutate, isPending, error, status } = useMutation<
-    TSystem,
-    TErrorResponse,
-    TSystemUpdate & { system_id: number }
-  >({
+  const { mutate, isPending, error } = useMutation<TSystem, TErrorResponse, TSystemUpdate & { system_id: number }>({
     mutationFn: updateSystem,
     onSuccess: (data) => {
       queryClient.setQueryData([SYSTEMS.RETRIEVE, { user_id: user?.id, system_id: system_id }], data);
@@ -83,6 +80,7 @@ const Page: React.FC<PageProps> = ({ params }) => {
           }),
         );
       }
+      reset({ ...data, image });
     },
   });
 
@@ -93,14 +91,13 @@ const Page: React.FC<PageProps> = ({ params }) => {
     formState: { dirtyFields, errors, isValid },
     clearErrors,
     reset,
+    trigger,
     setValue,
   } = useForm<TSystemUpdateBefore>({
     defaultValues: { ...data, image },
     resolver: zodResolver(systemUpdateValidation),
     mode: 'all',
   });
-
-  const formWatch = watch();
 
   const handleFormSubmit = useCallback(
     (formData: TSystemUpdateBefore) => {
@@ -133,18 +130,17 @@ const Page: React.FC<PageProps> = ({ params }) => {
   );
   const onDeleteUploadFileClick = useCallback(() => setValue('image', undefined, { shouldDirty: true }), [setValue]);
 
+  // временное решение. Не обнавляется стейт формы.
   useEffect(() => {
-    if (status === 'success') {
-      reset({ ...data, image });
-    }
-  }, [data, image, reset, status]);
-
-  useEffect(
-    () => () => {
+    const subscription = watch((value, { name }) => {
+      setformWatch(value);
+      trigger(name);
+    });
+    return () => {
+      subscription.unsubscribe();
       clearErrors();
-    },
-    [clearErrors],
-  );
+    };
+  }, [clearErrors, trigger, watch]);
 
   return (
     <main className={cnSystem('wrapper')}>
@@ -152,7 +148,7 @@ const Page: React.FC<PageProps> = ({ params }) => {
         <Input
           {...register('name')}
           placeholder="Название системы"
-          label={formWatch.name?.length ? 'Название ситемы' : undefined}
+          label={formWatch?.name?.length ? 'Название ситемы' : undefined}
           error={!!errors.name}
           afterSlot={<ErrorPopup error={errors.name?.message} />}
           className={cnSystem('input')}
@@ -168,7 +164,7 @@ const Page: React.FC<PageProps> = ({ params }) => {
               onDeleteClick={onDeleteUploadFileClick}
             />
             <div className={cnSystem('checkbox')}>
-              <CheckBox {...register('private')} checked={formWatch.private} disabled={isPending} />
+              <CheckBox {...register('private')} disabled={isPending} />
               <Text view={TEXT_VIEW.p18} className={cnSystem('checkbox-label')}>
                 Приватная
               </Text>
@@ -178,7 +174,7 @@ const Page: React.FC<PageProps> = ({ params }) => {
             {...register('about')}
             className={cnSystem('about')}
             placeholder="Описание системы"
-            label={!!formWatch.about?.length && 'Описание системы'}
+            label={!!formWatch?.about?.length && 'Описание системы'}
             error={!!errors.about}
             afterSlot={<ErrorPopup error={errors.about?.message} />}
             disabled={isPending}
