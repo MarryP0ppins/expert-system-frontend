@@ -2,8 +2,8 @@ import React from 'react';
 
 import Icon, { IconProps } from '../Icon';
 
-const StarIcon = React.forwardRef<SVGSVGElement, IconProps>((props, ref) => (
-  <Icon {...props} ref={ref} viewBox="0 0 24 24" fill="none">
+const StarIcon: React.FC<IconProps> = (props) => (
+  <Icon {...props} viewBox="0 0 24 24" fill="none">
     <g id="SVGRepo_bgCarrier" strokeWidth="0" />
     <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round" />
     <g id="SVGRepo_iconCarrier">
@@ -13,6 +13,6 @@ const StarIcon = React.forwardRef<SVGSVGElement, IconProps>((props, ref) => (
       />
     </g>
   </Icon>
-));
+);
 
 export default StarIcon;

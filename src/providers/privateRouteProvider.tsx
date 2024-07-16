@@ -1,5 +1,5 @@
 'use client';
-import { ReactNode, useEffect, useLayoutEffect } from 'react';
+import { PropsWithChildren, useEffect, useLayoutEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import Cookies from 'js-cookie';
 import { redirect, usePathname, useSearchParams } from 'next/navigation';
@@ -20,7 +20,7 @@ const allowURL = [
   /^\/resetpassword\/[a-zA-Z0-9]+$/,
 ];
 
-export const PrivateRouterProvider = ({ children }: { children: ReactNode }) => {
+export const PrivateRouterProvider = ({ children }: PropsWithChildren) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 

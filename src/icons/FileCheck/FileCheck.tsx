@@ -2,8 +2,8 @@ import React from 'react';
 
 import Icon, { IconProps } from '../Icon';
 
-const AddIcon = React.forwardRef<SVGSVGElement, IconProps>((props, ref) => (
-  <Icon {...props} ref={ref} viewBox="0 0 24 24" fill="none">
+const AddIcon: React.FC<IconProps> = (props) => (
+  <Icon {...props} viewBox="0 0 24 24" fill="none">
     <path
       d="M13 2.5V5C13 7.35702 13 8.53553 13.7322 9.26777C14.4645 10 15.643 10 18 10H22"
       stroke="currentColor"
@@ -21,6 +21,6 @@ const AddIcon = React.forwardRef<SVGSVGElement, IconProps>((props, ref) => (
       fill="currentColor"
     />
   </Icon>
-));
+);
 
 export default AddIcon;

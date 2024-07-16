@@ -1,5 +1,5 @@
 'use client';
-import { ReactNode } from 'react';
+import { PropsWithChildren } from 'react';
 
 import Loader from '@/components/Loader';
 import useSystemStore from '@/store/systemStore';
@@ -8,7 +8,7 @@ import useUserStore from '@/store/userStore';
 import { PrivateRouterProvider } from './privateRouteProvider';
 import { ReactQueryProvider } from './reactQuery';
 
-export const Providers = ({ children }: { children: ReactNode }) => {
+export const Providers = ({ children }: PropsWithChildren) => {
   const isLogin = useUserStore((store) => store.isLogin);
   const isLoading = useSystemStore((store) => store.isLoading);
 

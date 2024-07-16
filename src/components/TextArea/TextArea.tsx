@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { RefObject } from 'react';
 
 import { classname } from '@/utils/classname';
 
@@ -11,24 +11,23 @@ export type TextAreaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement> & 
   afterSlot?: React.ReactNode;
   error?: boolean;
   label?: string | boolean;
+  ref?: RefObject<HTMLTextAreaElement>;
 };
 
 const cnTextArea = classname(classes, 'textArea');
 
-const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
-  ({ afterSlot, className, error, label, ...props }, ref) => {
-    return (
-      <Text
-        tag={TEXT_TAG.div}
-        view={TEXT_VIEW.p16}
-        className={cnTextArea('container', { error: !!error }) + ` ${className}`}
-      >
-        <div className={cnTextArea('label', { visible: !!label })}>{label}</div>
-        <textarea {...props} ref={ref} className={cnTextArea()} />
-        {afterSlot}
-      </Text>
-    );
-  },
-);
+const TextArea: React.FC<TextAreaProps> = ({ afterSlot, className, error, label, ...props }) => {
+  return (
+    <Text
+      tag={TEXT_TAG.div}
+      view={TEXT_VIEW.p16}
+      className={cnTextArea('container', { error: !!error }) + ` ${className}`}
+    >
+      <div className={cnTextArea('label', { visible: !!label })}>{label}</div>
+      <textarea {...props} className={cnTextArea()} />
+      {afterSlot}
+    </Text>
+  );
+};
 
 export default TextArea;

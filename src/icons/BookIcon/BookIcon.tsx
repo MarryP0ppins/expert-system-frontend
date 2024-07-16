@@ -2,8 +2,8 @@ import React from 'react';
 
 import Icon, { IconProps } from '../Icon';
 
-const BookIcon = React.forwardRef<SVGSVGElement, IconProps>((props, ref) => (
-  <Icon {...props} ref={ref} viewBox="0 0 24 24" fill="none">
+const BookIcon: React.FC<IconProps> = (props) => (
+  <Icon {...props} viewBox="0 0 24 24" fill="none">
     <path
       d="M19.8978 16H7.89778C6.96781 16 6.50282 16 6.12132 16.1022C5.08604 16.3796 4.2774 17.1883 4 18.2235"
       stroke="currentColor"
@@ -19,6 +19,6 @@ const BookIcon = React.forwardRef<SVGSVGElement, IconProps>((props, ref) => (
       strokeLinecap="round"
     />
   </Icon>
-));
+);
 
 export default BookIcon;

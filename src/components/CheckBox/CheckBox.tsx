@@ -1,19 +1,19 @@
-import React from 'react';
+import React, { RefObject } from 'react';
 
 import CheckIcon from '@/icons/CheckIcon';
 import { classname } from '@/utils/classname';
 
 import classes from './CheckBox.module.scss';
 
-export type CheckBoxProps = React.InputHTMLAttributes<HTMLInputElement>;
+export type CheckBoxProps = React.InputHTMLAttributes<HTMLInputElement> & { ref?: RefObject<HTMLInputElement> };
 
 const cnCheckBox = classname(classes, 'checkbox');
 
-const CheckBox = React.forwardRef<HTMLInputElement, CheckBoxProps>(({ className, ...props }, ref) => (
+const CheckBox: React.FC<CheckBoxProps> = ({ className, ...props }) => (
   <label className={cnCheckBox('container') + ` ${className}`}>
-    <input {...props} ref={ref} type="checkbox" className={cnCheckBox()} />
+    <input {...props} type="checkbox" className={cnCheckBox()} />
     <CheckIcon className={cnCheckBox('icon')} />
   </label>
-));
+);
 
 export default CheckBox;

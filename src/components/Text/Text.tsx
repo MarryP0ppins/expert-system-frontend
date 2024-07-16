@@ -1,4 +1,4 @@
-import React, { ReactHTML } from 'react';
+import React, { PropsWithChildren, ReactHTML } from 'react';
 
 import { classname } from '@/utils/classname';
 
@@ -6,7 +6,7 @@ import { TEXT_TAG, TEXT_VIEW, TEXT_WEIGHT } from './Text.types';
 
 import classes from './Text.module.scss';
 
-export type TextProps = {
+export type TextProps = PropsWithChildren & {
   /** Дополнительный класс */
   className?: string;
   /** Стиль отображения */
@@ -15,8 +15,6 @@ export type TextProps = {
   tag?: TEXT_TAG;
   /** Начертание шрифта */
   weight?: TEXT_WEIGHT;
-  /** Контент */
-  children: React.ReactNode;
   /** Цвет */
   color?: 'primary' | 'secondary' | 'accent';
   /** Максимальное кол-во строк */
