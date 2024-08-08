@@ -1,4 +1,5 @@
 import React, { RefObject, useCallback, useRef, useState } from 'react';
+import { RefCallBack } from 'react-hook-form';
 import Image from 'next/image';
 
 import CloseIcon from '@/icons/CloseIcon';
@@ -13,7 +14,7 @@ import classes from './FileUpload.module.scss';
 export type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   initialImageUrl?: string;
   onDeleteClick?: () => void;
-  ref?: RefObject<HTMLInputElement>;
+  ref?: RefObject<HTMLInputElement> | RefCallBack;
 };
 
 const cnFileUpload = classname(classes, 'file-upload');

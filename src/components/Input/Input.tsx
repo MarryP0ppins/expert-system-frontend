@@ -1,4 +1,5 @@
 import React, { RefObject } from 'react';
+import { RefCallBack } from 'react-hook-form';
 
 import { classname } from '@/utils/classname';
 
@@ -12,7 +13,7 @@ export type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   error?: boolean;
   label?: string;
   labelTitle?: string;
-  ref?: RefObject<HTMLInputElement>;
+  ref?: RefObject<HTMLInputElement> | RefCallBack;
 };
 
 const cnInput = classname(classes, 'input');
@@ -25,6 +26,7 @@ const Input: React.FC<InputProps> = ({
   label,
   labelTitle,
   readOnly,
+  ref,
   ...props
 }) => {
   return (
@@ -36,7 +38,7 @@ const Input: React.FC<InputProps> = ({
       <div className={cnInput('label', { visible: !!label })} title={labelTitle}>
         {label}
       </div>
-      <input {...props} type={type} readOnly={readOnly} className={cnInput({ readOnly })} />
+      <input {...props} ref={ref} type={type} readOnly={readOnly} className={cnInput({ readOnly })} />
       {afterSlot}
     </Text>
   );

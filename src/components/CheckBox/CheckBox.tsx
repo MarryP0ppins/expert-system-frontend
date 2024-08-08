@@ -1,11 +1,14 @@
 import React, { RefObject } from 'react';
+import { RefCallBack } from 'react-hook-form';
 
 import CheckIcon from '@/icons/CheckIcon';
 import { classname } from '@/utils/classname';
 
 import classes from './CheckBox.module.scss';
 
-export type CheckBoxProps = React.InputHTMLAttributes<HTMLInputElement> & { ref?: RefObject<HTMLInputElement> };
+export type CheckBoxProps = React.InputHTMLAttributes<HTMLInputElement> & {
+  ref?: RefObject<HTMLInputElement> | RefCallBack;
+};
 
 const cnCheckBox = classname(classes, 'checkbox');
 

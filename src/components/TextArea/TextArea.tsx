@@ -1,4 +1,5 @@
 import React, { RefObject } from 'react';
+import { RefCallBack } from 'react-hook-form';
 
 import { classname } from '@/utils/classname';
 
@@ -11,7 +12,7 @@ export type TextAreaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement> & 
   afterSlot?: React.ReactNode;
   error?: boolean;
   label?: string | boolean;
-  ref?: RefObject<HTMLTextAreaElement>;
+  ref?: RefObject<HTMLTextAreaElement> | RefCallBack;
 };
 
 const cnTextArea = classname(classes, 'textArea');
