@@ -1,6 +1,6 @@
 'use client';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import React, { useCallback, useEffect, useMemo } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
@@ -35,7 +35,7 @@ type PageProps = {
 const Page: React.FC<PageProps> = ({ params }) => {
   const queryClient = getQueryClient();
   const user = useUserStore((store) => store.user);
-  const [formWatch, setformWatch] = useState<Partial<TSystemUpdateBefore>>();
+  //const [formWatch, setformWatch] = useState<Partial<TSystemUpdateBefore>>();
 
   const system_id = useMemo(() => Number(params.system_id) ?? -1, [params]);
 
@@ -86,13 +86,12 @@ const Page: React.FC<PageProps> = ({ params }) => {
 
   const {
     register,
-    watch,
     handleSubmit,
     formState: { dirtyFields, errors, isValid },
     clearErrors,
     reset,
-    trigger,
     setValue,
+    control,
   } = useForm<TSystemUpdateBefore>({
     defaultValues: { ...data, image },
     resolver: zodResolver(systemUpdateValidation),
@@ -131,16 +130,20 @@ const Page: React.FC<PageProps> = ({ params }) => {
   const onDeleteUploadFileClick = useCallback(() => setValue('image', undefined, { shouldDirty: true }), [setValue]);
 
   // временное решение. Не обнавляется стейт формы.
-  useEffect(() => {
-    const subscription = watch((value, { name }) => {
-      setformWatch(value);
-      trigger(name);
-    });
-    return () => {
-      subscription.unsubscribe();
-      clearErrors();
-    };
-  }, [clearErrors, trigger, watch]);
+  // useEffect(() => {
+  //   const subscription = watch((value, { name }) => {
+  //     setformWatch(value);
+  //     trigger(name);
+  //   });
+  //   return () => {
+  //     subscription.unsubscribe();
+  //     clearErrors();
+  //   };
+  // }, [clearErrors, trigger, watch]);
+
+  const formWatch = useWatch({ control });
+
+  useEffect(() => () => clearErrors(), [clearErrors]);
 
   return (
     <main className={cnSystem('wrapper')}>

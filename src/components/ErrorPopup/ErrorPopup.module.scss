@@ -1,5 +1,5 @@
 .errorPopup {
-  //anchor-name: --anchor-el;
+  anchor-name: --anchor-el;
   anchor-scope: --anchor-el;
 
   &-text {
@@ -23,7 +23,7 @@
     font: inherit;
     cursor: pointer;
     outline: inherit;
-    anchor-name: --anchor-el;
+    //anchor-name: --anchor-el;
 
     &_visible {
       display: none;
@@ -41,8 +41,8 @@
     // right: 0
     position-anchor: --anchor-el;
     inset-area: top span-left;
-    //bottom: anchor(top);
-    //right: anchor(right);
+    bottom: anchor(top);
+    right: anchor(right);
     margin: 0;
   }
 }

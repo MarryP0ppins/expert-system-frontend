@@ -1,6 +1,6 @@
 'use client';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import React, { useCallback, useEffect, useMemo } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
@@ -26,7 +26,7 @@ import classes from './page.module.scss';
 const cnProfile = classname(classes, 'profile');
 
 const Page: React.FC = () => {
-  const [formWatch, setformWatch] = useState<Partial<TUserUpdate>>();
+  //const [formWatch, setformWatch] = useState<Partial<TUserUpdate>>();
 
   const { user, setStates } = useUserStore(useShallow((store) => ({ user: store.user, setStates: store.setStates })));
   const { dialogRef, openDialog, closeDialog } = useDialogController();
@@ -34,11 +34,10 @@ const Page: React.FC = () => {
   const {
     register,
     getValues,
-    watch,
     handleSubmit,
     reset,
-    trigger,
     formState: { dirtyFields, errors, isValid },
+    control,
     clearErrors,
   } = useForm<TUserUpdate>({
     defaultValues: { ...user, new_password: '' },
@@ -78,16 +77,20 @@ const Page: React.FC = () => {
   }, [closeDialog, getValues, dirtyFields, mutate, reset]);
 
   // временное решение. Не обнавляется стейт формы.
-  useEffect(() => {
-    const subscription = watch((value, { name }) => {
-      setformWatch(value);
-      trigger(name);
-    });
-    return () => {
-      subscription.unsubscribe();
-      clearErrors();
-    };
-  }, [clearErrors, trigger, watch]);
+  // useEffect(() => {
+  //   const subscription = watch((value, { name }) => {
+  //     setformWatch(value);
+  //     trigger(name);
+  //   });
+  //   return () => {
+  //     subscription.unsubscribe();
+  //     clearErrors();
+  //   };
+  // }, [clearErrors, trigger, watch]);
+
+  const formWatch = useWatch({ control });
+
+  useEffect(() => () => clearErrors(), [clearErrors]);
 
   return (
     <div className={cnProfile()}>

@@ -1,6 +1,6 @@
 'use client';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import React, { useCallback, useEffect, useMemo } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 
@@ -20,16 +20,15 @@ import classes from './page.module.scss';
 const cnRegistrationPage = classname(classes, 'registrationPage');
 
 const Page: React.FC = () => {
-  const [formWatch, setFormWatch] = useState<Partial<TUserRegistration>>();
+  // const [formWatch, setFormWatch] = useState<Partial<TUserRegistration>>();
 
   const {
     register,
     handleSubmit,
-    watch,
     clearErrors,
     getValues,
-    trigger,
     formState: { errors },
+    control,
   } = useForm<TUserRegistration>({ resolver: zodResolver(userRegistrationValidation), mode: 'all' });
 
   const { mutate, error, isPending, isSuccess } = useMutation({
@@ -54,14 +53,16 @@ const Page: React.FC = () => {
     [clearErrors],
   );
 
-  // временное решение. Не обнавляется стейт формы.
-  useEffect(() => {
-    const subscription = watch((value, { name }) => {
-      setFormWatch(value);
-      trigger(name);
-    });
-    return () => subscription.unsubscribe();
-  }, [trigger, watch]);
+  //  временное решение. Не обнавляется стейт формы.
+  // useEffect(() => {
+  //   const subscription = watch((value, { name }) => {
+  //     setFormWatch(value);
+  //     trigger(name);
+  //   });
+  //   return () => subscription.unsubscribe();
+  // }, [trigger, watch]);
+
+  const formWatch = useWatch({ control });
 
   return (
     <main className={cnRegistrationPage('wrapper')}>

@@ -1,6 +1,6 @@
 'use client';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import React, { useCallback, useEffect, useMemo } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
@@ -29,15 +29,14 @@ const cnSystemCreatePage = classname(classes, 'systemCreatePage');
 const Page: React.FC = () => {
   const router = useRouter();
   const user = useUserStore((store) => store.user);
-  const [formWatch, setformWatch] = useState<Partial<TSystemNew>>();
+  //const [formWatch, setformWatch] = useState<Partial<TSystemNew>>();
 
   const {
     register,
     handleSubmit,
-    watch,
     clearErrors,
-    trigger,
     formState: { errors, isValid },
+    control,
   } = useForm<TSystemNew>({
     defaultValues: { private: true },
     resolver: zodResolver(systemNewValidation),
@@ -72,16 +71,20 @@ const Page: React.FC = () => {
   const handleFormSubmit = useCallback((data: TSystemNew) => mutate(data), [mutate]);
 
   // временное решение. Не обнавляется стейт формы.
-  useEffect(() => {
-    const subscription = watch((value, { name }) => {
-      setformWatch(value);
-      trigger(name);
-    });
-    return () => {
-      subscription.unsubscribe();
-      clearErrors();
-    };
-  }, [clearErrors, trigger, watch]);
+  // useEffect(() => {
+  //   const subscription = watch((value, { name }) => {
+  //     setformWatch(value);
+  //     trigger(name);
+  //   });
+  //   return () => {
+  //     subscription.unsubscribe();
+  //     clearErrors();
+  //   };
+  // }, [clearErrors, trigger, watch]);
+
+  const formWatch = useWatch({ control });
+
+  useEffect(() => () => clearErrors(), [clearErrors]);
 
   return (
     <div className={cnSystemCreatePage()}>
