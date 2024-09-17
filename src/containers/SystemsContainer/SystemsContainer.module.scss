@@ -1,8 +1,8 @@
 .systemsContainer {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(auto-fit, 280px);
   justify-content: space-evenly;
-  position: relative;
   gap: 40px;
   width: 100%;
   margin-top: 40px;

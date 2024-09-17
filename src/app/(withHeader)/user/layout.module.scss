@@ -1,10 +1,10 @@
 .userPage-layout {
   display: grid;
-  grid-template-rows: max-content 1fr;
   grid-template-columns: 100%;
-  align-items: center;
+  grid-template-rows: max-content 1fr;
   justify-items: center;
+  align-items: center;
+  width: 100%;
 
   min-height: 100%;
-  width: 100%;
 }

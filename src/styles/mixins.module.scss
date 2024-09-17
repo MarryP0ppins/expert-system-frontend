@@ -1,36 +1,36 @@
 @mixin title {
-  font-size: 44px;
   font-weight: 700;
+  font-size: 44px;
   line-height: 48px;
 }
 @mixin button {
-  font-size: 18px;
   font-weight: 400;
+  font-size: 18px;
   line-height: 18px;
 }
 @mixin p-20 {
-  font-size: 20px;
   font-weight: 400;
+  font-size: 20px;
   line-height: 24px;
 }
 @mixin p-16 {
-  font-size: 16px;
   font-weight: 400;
+  font-size: 16px;
   line-height: 20px;
 }
 @mixin p-14 {
-  font-size: 14px;
   font-weight: 400;
+  font-size: 14px;
   line-height: 18px;
 }
 @mixin p-18 {
-  font-size: 18px;
   font-weight: 400;
+  font-size: 18px;
   line-height: 22px;
 }
 @mixin p-24 {
-  font-size: 24px;
   font-weight: 600;
+  font-size: 24px;
   line-height: 26px;
 }
 @mixin square($width) {
@@ -39,23 +39,23 @@
 }
 
 @mixin page-background($page-color) {
-  background-color: $page-color;
   background: linear-gradient(90deg, $project-bg 0%, $page-color 10%, $page-color 90%, $project-bg 100%);
+  background-color: $page-color;
 }
 
 @mixin page-setup($page-color) {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: relative;
+  gap: $space-xl;
+  width: 100%;
+  max-width: 1440px;
+  height: max-content;
+  min-height: calc(100dvh - 64px);
   padding: 40px 100px 20px;
   padding-right: calc(100px - var(--scroll-width));
-  height: max-content;
   @include page-background($page-color);
-  gap: $space-xl;
-  max-width: 1440px;
-  width: 100%;
-  min-height: calc(100dvh - 64px);
 
   @media screen and (max-width: 1012px) {
     padding: 20px 6% 16px;
@@ -68,30 +68,30 @@
 }
 
 @mixin shadow-hover {
-  box-shadow: 0;
   border: 1px solid $border-color;
+  box-shadow: 0;
   @media (hover: hover) {
+    border: 0;
     &:hover {
       box-shadow: 0px 4px 10px 0px rgba($color: #000000, $alpha: 0.25);
     }
-    border: 0;
   }
 }
 
 @mixin notselect {
-  -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  -webkit-touch-callout: none;
 }
 
 @mixin notbutton {
-  background: none;
-  color: inherit;
   border: none;
-  font: inherit;
-  cursor: pointer;
   outline: inherit;
+  color: inherit;
+  font: inherit;
+  background: none;
+  cursor: pointer;
 }

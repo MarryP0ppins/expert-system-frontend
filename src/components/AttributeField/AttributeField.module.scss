@@ -1,10 +1,10 @@
 .fieldWithFields {
+  position: relative;
+  width: 100%;
+  max-width: 1000px;
   border: 1px solid $border-color;
   border-radius: $border-radius;
   padding: 14px;
-  max-width: 1000px;
-  width: 100%;
-  position: relative;
 
   &-input {
     width: 100%;
@@ -15,9 +15,9 @@
     flex-direction: row;
     align-items: center;
     gap: $space-s;
-    padding: $space-s 0 0 0;
-    max-width: 1000px;
     width: 100%;
+    max-width: 1000px;
+    padding: $space-s 0 0 0;
 
     &-input {
       width: 100%;
@@ -34,9 +34,9 @@
 
     top: -12px;
     right: -12px;
-    color: $error;
-    cursor: pointer;
-    background-color: $project-bg;
     border-radius: 50%;
+    color: $error;
+    background-color: $project-bg;
+    cursor: pointer;
   }
 }

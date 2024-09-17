@@ -1,18 +1,18 @@
 .editor-system {
   display: flex;
   flex-direction: column;
+  gap: $space-l;
   border: 1px solid $border-color;
   border-radius: $border-radius;
   padding: 12px;
-  gap: $space-l;
 
   &-wrapper {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100%;
     width: 100%;
+    height: 100%;
   }
   &-title {
     width: 100%;

@@ -1,15 +1,15 @@
 .clauseGroup {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: $space-s;
-  padding: $space-s 0 0 0;
-  max-width: 1000px;
   width: 100%;
+  max-width: 1000px;
   border: 1px solid $border-color;
   border-radius: $border-radius;
+  padding: $space-s 0 0 0;
   padding: 12px;
-  position: relative;
 
   &-input {
     width: 100%;
@@ -18,9 +18,9 @@
   &-clauseList {
     display: flex;
     flex-direction: column;
-    max-width: 1000px;
-    width: 100%;
     gap: $space-s;
+    width: 100%;
+    max-width: 1000px;
   }
 
   &-newClause {
@@ -45,10 +45,10 @@
 
     top: -12px;
     right: -12px;
-    color: $error;
-    cursor: pointer;
-    background-color: $project-bg;
     border-radius: 50%;
+    color: $error;
+    background-color: $project-bg;
+    cursor: pointer;
   }
 
   &-or {

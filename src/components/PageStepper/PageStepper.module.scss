@@ -13,8 +13,8 @@
     }
 
     &_disabled {
-      cursor: default;
       color: $text-secondary;
+      cursor: default;
       pointer-events: none;
     }
   }
@@ -23,20 +23,20 @@
     display: flex !important;
     justify-content: center;
     width: 38px;
-    padding: 10px;
     border-radius: $border-radius;
+    padding: 10px;
     cursor: pointer;
 
     &:not(:where(.pagestepper-page_currentPage)) {
       &:hover {
-        background-color: $pagestepper-bg-hover;
         color: $pagestepper-text-hover !important;
+        background-color: $pagestepper-bg-hover;
       }
     }
 
     &_currentPage {
-      background-color: $brand;
       color: $pagestepper-text !important;
+      background-color: $brand;
     }
   }
 

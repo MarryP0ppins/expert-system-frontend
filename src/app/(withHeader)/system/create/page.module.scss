@@ -3,14 +3,14 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  height: 100%;
   width: 100%;
+  height: 100%;
 
   &-header {
     display: flex;
     flex-direction: row;
-    align-items: center;
     justify-content: space-evenly;
+    align-items: center;
     gap: $space-m;
     width: 100%;
   }
@@ -24,10 +24,10 @@
   &-form {
     display: flex;
     flex-direction: column;
+    gap: $space-l;
     border: 1px solid $border-color;
     border-radius: $border-radius;
     padding: 12px;
-    gap: $space-l;
   }
 
   &-raw {
@@ -70,8 +70,8 @@
   }
 
   &-err {
+    max-width: 600px;
     margin: 0;
     color: $error;
-    max-width: 600px;
   }
 }

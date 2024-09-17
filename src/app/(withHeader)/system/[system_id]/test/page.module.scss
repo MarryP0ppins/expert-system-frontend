@@ -3,14 +3,14 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  max-height: 100%;
   width: 100%;
+  max-height: 100%;
 
   &-header {
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: space-evenly;
+    align-items: center;
     width: 100%;
   }
 
@@ -21,10 +21,10 @@
 
   &-subtitle {
     width: 100%;
-    text-align: start;
-    margin-bottom: 0;
-    text-decoration: underline;
     max-width: 1100px;
+    margin-bottom: 0;
+    text-align: start;
+    text-decoration: underline;
 
     &_nothing {
       text-align: center;
@@ -37,12 +37,12 @@
   }
 
   &-main {
-    width: 100%;
     display: flex;
     flex-direction: row;
-    align-items: flex-start;
     justify-content: space-between;
+    align-items: flex-start;
     gap: $space-xl;
+    width: 100%;
     max-width: 1100px;
 
     &_testIsEnd {
@@ -75,8 +75,8 @@
   &-options {
     display: flex;
     flex-direction: column;
-    overflow: auto;
     width: 100%;
+    overflow: auto;
   }
   &-option {
     display: flex;
@@ -90,8 +90,8 @@
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
-    width: 100%;
     gap: 8px;
+    width: 100%;
     margin: 30px 0;
     padding-bottom: 30px;
   }
@@ -108,8 +108,8 @@
       background-color: $green;
 
       &_disabled {
-        cursor: default;
         background-color: rgba($green, 0.5);
+        cursor: default;
       }
 
       &:hover:enabled {

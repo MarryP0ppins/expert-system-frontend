@@ -1,8 +1,8 @@
 .about {
-  max-width: 1000px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  max-width: 1000px;
 
   height: 100%;
 
@@ -52,29 +52,29 @@
   }
 
   &-starIcon {
-    transition: color 0.2s;
-    stroke: #ff0000;
     color: transparent;
+    stroke: #ff0000;
+    transition: color 0.2s;
   }
 
   &-button {
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
     gap: $space-xxs;
-    min-height: 52px;
     width: max-content;
-    padding: $space-s $space-l;
+    min-height: 52px;
     border: 0;
     border-radius: $border-radius;
+    padding: $space-s $space-l;
     overflow: hidden;
-    background-color: $button-primary-bg;
     color: $button-primary-text;
+    background-color: $button-primary-bg;
     cursor: pointer;
 
     &:hover {
-      background-color: $button-primary-bg-hover;
       color: $button-primary-text-hover;
+      background-color: $button-primary-bg-hover;
     }
   }
 }

@@ -1,16 +1,16 @@
 .editorHeader {
   display: flex;
   flex-direction: row;
-  align-items: center;
   justify-content: space-around;
+  align-items: center;
   gap: $space-m;
   width: 100%;
 
   &-section {
-    cursor: pointer;
     width: 100px;
     margin-top: 12px;
     font-weight: 500;
+    cursor: pointer;
 
     &_selected {
       text-decoration: underline;

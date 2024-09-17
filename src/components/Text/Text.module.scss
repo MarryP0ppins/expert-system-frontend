@@ -1,10 +1,10 @@
 .text {
-  overflow: hidden;
   display: -webkit-box;
-  -webkit-box-orient: vertical;
-  color: currentColor;
   height: max-content;
+  overflow: hidden;
+  color: currentColor;
   text-align: center;
+  -webkit-box-orient: vertical;
 
   &_color {
     &_primary {

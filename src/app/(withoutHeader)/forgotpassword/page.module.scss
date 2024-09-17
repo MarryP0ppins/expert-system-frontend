@@ -1,28 +1,28 @@
 .loginPage {
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   gap: $space-m;
   width: max-content;
-  padding: 24px;
-  margin: 24px;
-  background-color: #fff;
-  border-radius: $border-radius;
   max-width: 320px;
+  margin: 24px;
+  border-radius: $border-radius;
+  padding: 24px;
+  background-color: #fff;
   @include shadow;
 
   &-wrapper {
-    width: 100%;
-    min-height: 100%;
-    align-items: center;
-    justify-content: center;
-    align-content: center;
-    overflow: auto;
 
     display: grid;
     grid-template-columns: max-content;
     grid-template-rows: max-content;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    width: 100%;
+    min-height: 100%;
+    overflow: auto;
   }
 
   &-input {
@@ -38,8 +38,8 @@
   }
 
   &-err {
-    color: $error;
     margin: 0;
+    color: $error;
   }
 
   &-ok {

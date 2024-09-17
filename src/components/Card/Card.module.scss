@@ -1,28 +1,28 @@
 .card {
+  position: relative;
   display: grid;
   grid-template-rows: 280px 1fr auto;
   justify-content: center;
   max-width: 288px;
   height: auto;
-  background-color: $card-bg;
+  margin: 4px;
   border-radius: $border-radius;
   overflow: hidden;
-  cursor: pointer;
-  position: relative;
-  margin: 4px;
-  @include shadow-hover;
+  background-color: $card-bg;
   transition:
     scale 200ms,
     box-shadow 200ms;
+  cursor: pointer;
+  @include shadow-hover;
 
   &:hover {
     scale: 1.005;
   }
 
   &-image {
-    background-color: $card-image-bg;
     width: 280px;
     height: 280px;
+    background-color: $card-image-bg;
   }
 
   &-info {
@@ -38,19 +38,19 @@
   }
 
   &-deleteIcon {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
     position: absolute;
     top: 4px;
     right: 4px;
-    border-radius: 50%;
-    background-color: #fff;
-    padding: 4px;
-    opacity: 0.5;
-    border: 1px solid $border-color;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
     width: 32px;
     height: 32px;
+    border: 1px solid $border-color;
+    border-radius: 50%;
+    padding: 4px;
+    opacity: 0.5;
+    background-color: #fff;
 
     &:hover {
       opacity: 1 !important;
@@ -69,15 +69,15 @@
   &-modal {
     position: fixed;
     inset: 0px;
-    padding: $space-xl;
-    border-radius: 12px;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
+    align-items: center;
     gap: 24px;
-    background-color: #fff;
     max-width: 400px;
+    border-radius: 12px;
+    padding: $space-xl;
     overflow: visible;
+    background-color: #fff;
     cursor: default;
     @include shadow;
 
@@ -98,10 +98,10 @@
 
   &-closeIcon {
     position: absolute;
-    width: 36px;
-    height: 36px;
     top: -10px;
     right: -10px;
+    width: 36px;
+    height: 36px;
     color: $brand;
     cursor: pointer;
   }
@@ -120,22 +120,22 @@
   }
 
   &-popup {
-    background-color: #fff;
-    border-radius: $border-radius;
     border: 1px solid $border-color;
-    @include shadow;
+    border-radius: $border-radius;
     overflow: hidden;
+    background-color: #fff;
+    @include shadow;
   }
 
   &-dotsIcon {
     position: absolute;
     top: 4px;
     left: 4px;
+    border: 1px solid $border-color;
     border-radius: 50%;
-    background-color: #fff;
     padding: 4px;
     opacity: 0.5;
-    border: 1px solid $border-color;
+    background-color: #fff;
 
     &:hover {
       opacity: 1 !important;
@@ -151,12 +151,12 @@
     flex-direction: row;
     align-items: center;
     gap: $space-xs;
-    cursor: pointer;
     padding: 14px;
+    cursor: pointer;
 
     &:hover {
-      background-color: $button-primary-bg-hover;
       color: #fff;
+      background-color: $button-primary-bg-hover;
     }
   }
 
@@ -170,32 +170,32 @@
     flex-direction: row;
     align-items: center;
     gap: 4px;
-    background-color: $star-bg;
-    border-radius: 14px / 50%;
     width: min-content;
+    border-radius: 14px / 50%;
     padding: 4px 6px;
+    background-color: $star-bg;
     transition: all 0.2s;
 
     &_canLike {
       &:hover {
+        background-color: #ffc9c9;
         svg {
           color: #ff0000;
         }
-        background-color: #ffc9c9;
       }
     }
 
     &_active {
+      background-color: #ffc9c9;
       svg {
         color: #ff0000;
       }
-      background-color: #ffc9c9;
     }
   }
 
   &-starIcon {
-    transition: color 0.2s;
-    stroke: #ff0000;
     color: transparent;
+    stroke: #ff0000;
+    transition: color 0.2s;
   }
 }

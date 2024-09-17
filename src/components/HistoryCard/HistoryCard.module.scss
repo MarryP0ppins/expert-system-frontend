@@ -1,20 +1,20 @@
 .history-card {
+  position: relative;
   display: grid;
   grid-template-rows: repeat(3, auto) 1fr auto;
   gap: $space-l;
-  padding: $space-xl $space-xs;
-  height: 100%;
-  max-width: 280px;
   width: 100%;
-  background-color: $card-bg;
+  max-width: 280px;
+  height: 100%;
   border-radius: $border-radius;
+  padding: $space-xl $space-xs;
   overflow: hidden;
-  cursor: pointer;
-  position: relative;
-  @include shadow-hover;
+  background-color: $card-bg;
   transition:
     scale 200ms,
     box-shadow 200ms;
+  cursor: pointer;
+  @include shadow-hover;
 
   &:hover {
     scale: 1.01;
@@ -26,16 +26,16 @@
 
   &-modal {
     position: fixed;
-    padding: $space-xl;
     inset: 0px;
-    border-radius: 12px;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
-    background-color: #fff;
+    align-items: center;
     width: 400px;
     max-height: min(500px, calc(100dvh - 40px));
+    border-radius: 12px;
+    padding: $space-xl;
     overflow: visible;
+    background-color: #fff;
     @include shadow;
 
     &[open] {
@@ -64,17 +64,17 @@
 
   &-closeIcon {
     position: absolute;
-    width: 36px;
-    height: 36px;
     top: -10px;
     right: -10px;
+    width: 36px;
+    height: 36px;
     color: $brand;
     cursor: pointer;
   }
 
   &-repeatButton {
-    width: 100%;
     display: flex;
     justify-content: center;
+    width: 100%;
   }
 }

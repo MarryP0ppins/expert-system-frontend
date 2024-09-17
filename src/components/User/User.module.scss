@@ -1,12 +1,12 @@
 .user {
   display: flex;
   flex-direction: row;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   width: 40px;
   height: 40px;
-  border-radius: 50%;
   border: 2px solid $border-color;
+  border-radius: 50%;
   cursor: pointer;
   anchor-name: --anchor-user-lk;
 
@@ -15,19 +15,19 @@
   }
 
   &-popup {
-    background-color: #fff;
-    border-radius: $border-radius;
-    border: 1px solid $border-color;
-    margin: 6px 0 0 0;
-    padding: 0;
-    @include shadow;
-    overflow: hidden;
     position: absolute;
-    z-index: 1000;
-    position-anchor: --anchor-user-lk;
-    inset-area: bottom span-left;
     top: anchor(bottom);
     right: anchor(right);
+    z-index: 1000;
+    margin: 6px 0 0 0;
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
+    padding: 0;
+    overflow: hidden;
+    background-color: #fff;
+    position-anchor: --anchor-user-lk;
+    inset-area: bottom span-left;
+    @include shadow;
 
     &[open] {
       border: 0;
@@ -46,20 +46,20 @@
     flex-direction: row;
     align-items: center;
     gap: $space-xs;
-    cursor: pointer;
     padding: 14px;
+    cursor: pointer;
 
     &:hover {
-      background-color: $button-primary-bg-hover;
       color: #fff;
+      background-color: $button-primary-bg-hover;
     }
 
     &_isLogin {
       color: $error;
 
       &:hover {
-        background-color: $error;
         color: #fff;
+        background-color: $error;
       }
     }
   }

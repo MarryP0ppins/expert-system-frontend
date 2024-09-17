@@ -4,10 +4,10 @@
   text-align: justify;
 
   &-404 {
+    margin: 20px;
+    color: $brand;
     font-size: 120px;
     line-height: normal;
-    color: $brand;
-    margin: 20px;
     text-align: center;
   }
 
