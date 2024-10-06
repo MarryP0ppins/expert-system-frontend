@@ -1,9 +1,10 @@
 'use client';
-import React, { useCallback, useMemo } from 'react';
+import React, { use, useCallback, useMemo } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useSuspenseQueries } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
+import { notFound } from 'next/navigation';
 
 import { TQueryKey } from '@/api';
 import { getAttributesWithValues } from '@/api/services/attributes';
@@ -22,19 +23,25 @@ import { getQueryClient } from '@/utils/get-query-client';
 import { objectPromiseAll } from '@/utils/objectPromiseAll';
 import { handleFormSubmit, normilizeObjects, normilizeResponseDataObjects } from '@/utils/objectsPage';
 import { formObjectWithAttrValuesValidation } from '@/validation/objects';
+import { systemIdValidation } from '@/validation/searchParams';
 
 import classes from './page.module.scss';
 
 const cnObjects = classname(classes, 'editor-objects');
 
 type PageProps = {
-  params: { system_id: number };
+  params: Promise<{ system_id: string }>;
 };
 
 const Page: React.FC<PageProps> = ({ params }) => {
-  const queryClient = getQueryClient();
+  const systemIdParam = use(params).system_id;
+  const system_id = systemIdValidation.safeParse(systemIdParam).data;
 
-  const system_id = useMemo(() => Number(params.system_id) ?? -1, [params]);
+  if (!system_id) {
+    notFound();
+  }
+
+  const queryClient = getQueryClient();
 
   const [objectsWithAttrValuesQueryResult, attributeQueryResult] = useSuspenseQueries({
     queries: [

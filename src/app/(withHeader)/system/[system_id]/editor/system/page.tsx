@@ -1,9 +1,10 @@
 'use client';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { use, useCallback, useEffect } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
+import { notFound } from 'next/navigation';
 
 import { TQueryKey } from '@/api';
 import { getImage } from '@/api/services/image';
@@ -22,6 +23,7 @@ import { TErrorResponse } from '@/types/error';
 import { TSystem, TSystemsWithPage, TSystemUpdate, TSystemUpdateBefore } from '@/types/systems';
 import { classname } from '@/utils/classname';
 import { getQueryClient } from '@/utils/get-query-client';
+import { systemIdValidation } from '@/validation/searchParams';
 import { systemUpdateValidation } from '@/validation/system';
 
 import classes from './page.module.scss';
@@ -29,15 +31,20 @@ import classes from './page.module.scss';
 const cnSystem = classname(classes, 'editor-system');
 
 type PageProps = {
-  params: { system_id: number };
+  params: Promise<{ system_id: string }>;
 };
 
 const Page: React.FC<PageProps> = ({ params }) => {
+  const systemIdParam = use(params).system_id;
+  const system_id = systemIdValidation.safeParse(systemIdParam).data;
+
+  if (!system_id) {
+    notFound();
+  }
+
   const queryClient = getQueryClient();
   const user = useUserStore((store) => store.user);
   //const [formWatch, setformWatch] = useState<Partial<TSystemUpdateBefore>>();
-
-  const system_id = useMemo(() => Number(params.system_id) ?? -1, [params]);
 
   const { data } = useSuspenseQuery({
     queryKey: [SYSTEMS.RETRIEVE, { system: system_id }],

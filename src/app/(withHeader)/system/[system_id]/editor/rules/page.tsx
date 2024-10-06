@@ -1,9 +1,10 @@
 'use client';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { use, useCallback, useEffect, useMemo, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useSuspenseQueries } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
+import { notFound } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
 
 import { TQueryKey } from '@/api';
@@ -31,13 +32,14 @@ import { TRuleForForm, TRuleForm, TRuleNew } from '@/types/rules';
 import { classname } from '@/utils/classname';
 import { getQueryClient } from '@/utils/get-query-client';
 import { formRuleValidation } from '@/validation/rules';
+import { systemIdValidation } from '@/validation/searchParams';
 
 import classes from './page.module.scss';
 
 const cnRules = classname(classes, 'editor-rules');
 
 type PageProps = {
-  params: { system_id: number };
+  params: Promise<{ system_id: string }>;
 };
 
 const allQuestionSelect: Option = {
@@ -46,11 +48,16 @@ const allQuestionSelect: Option = {
 };
 
 const Page: React.FC<PageProps> = ({ params }) => {
+  const systemIdParam = use(params).system_id;
+  const system_id = systemIdValidation.safeParse(systemIdParam).data;
+
+  if (!system_id) {
+    notFound();
+  }
+
   const queryClient = getQueryClient();
   const { setAttributes, setQuestions } = useRulePageStore((store) => store);
   const [selectQuestion, setSelectQuestion] = useState<Option>(allQuestionSelect);
-
-  const system_id = useMemo(() => Number(params.system_id), [params]);
 
   const [attributeQueryResult, questionsQueryResult, rulesQueryResult] = useSuspenseQueries({
     queries: [

@@ -17,13 +17,14 @@ import classes from './page.module.scss';
 
 const cnAboutPage = classname(classes, 'about');
 
-type SystemAboutPageProps = {
-  params: { system_id: number };
+type PageProps = {
+  params: Promise<{ system_id: string }>;
 };
 
-const Page: React.FC<SystemAboutPageProps> = async ({ params }) => {
-  const system_id = systemIdValidation.safeParse(params).data?.system_id;
-  const cookie = cookies().get('session_id');
+const Page: React.FC<PageProps> = async ({ params }) => {
+  const systemIdParam = (await params).system_id;
+  const system_id = systemIdValidation.safeParse(systemIdParam).data;
+  const cookie = (await cookies()).get('session_id');
 
   if (!system_id || !cookie) {
     notFound();

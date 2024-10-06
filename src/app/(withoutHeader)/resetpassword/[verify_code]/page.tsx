@@ -1,9 +1,9 @@
 'use client';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { use, useCallback, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
+import { notFound, useRouter } from 'next/navigation';
 
 import { resetPasswordPost } from '@/api/services/user';
 import Button from '@/components/Button';
@@ -21,12 +21,18 @@ import classes from './page.module.scss';
 const cnLoginPage = classname(classes, 'loginPage');
 
 type ResetPasswordPageLayoutProps = {
-  params: { verify_code: string };
+  params: Promise<{ verify_code: string }>;
 };
 
 const Page: React.FC<ResetPasswordPageLayoutProps> = ({ params }) => {
+  const verifyCodeParam = use(params).verify_code;
+  const verify_code = verifyEmailValidation.safeParse(verifyCodeParam).data;
+
+  if (!verify_code) {
+    notFound();
+  }
+
   const router = useRouter();
-  const verify_code = useMemo(() => verifyEmailValidation.safeParse(params).data?.verify_code, [params]);
   const {
     register,
     handleSubmit,

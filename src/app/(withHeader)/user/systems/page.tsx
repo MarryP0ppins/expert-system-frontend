@@ -41,7 +41,7 @@ const Page: React.FC = () => {
     queryFn: (params: TQueryKey<{ user?: number; all_types: boolean }>) => getSystems(params.queryKey[1]),
   });
 
-  const addMutate = useMutation({
+  const { mutate: addMutate, isPending: addMutateIsPending } = useMutation({
     mutationFn: importSystem,
     onSuccess: (newSystem) => {
       queryClient.setQueryData<TSystemsWithPage>(
@@ -55,7 +55,7 @@ const Page: React.FC = () => {
     onSettled: () => setSystemFile(undefined),
   });
 
-  const mutate = useMutation({
+  const { mutate } = useMutation({
     mutationFn: deleteSystem,
     onMutate: async (data) => {
       await queryClient.cancelQueries({ queryKey: [SYSTEMS.GET_USER, { user: user?.id, all_types: true }] });
@@ -83,14 +83,14 @@ const Page: React.FC = () => {
     },
   });
 
-  const starAddMutation = useMutation({
+  const { mutate: starAddMutation } = useMutation({
     mutationFn: createLike,
     onSuccess: (newLike) => {
       updateLikes({ add: true, system_id: newLike.system_id, like_id: newLike.id });
     },
   });
 
-  const starRemoveMutation = useMutation({
+  const { mutate: starRemoveMutation } = useMutation({
     mutationFn: deleteLike,
     onSuccess: (deletedLike) => {
       updateLikes({ add: false, system_id: deletedLike });
@@ -98,10 +98,7 @@ const Page: React.FC = () => {
   });
 
   const handleClick = useCallback((id: number) => () => router.push(`/system/${id}/test`), [router]);
-  const handleDelete = useCallback(
-    (id: number, password: string) => mutate.mutate({ system_id: id, password }),
-    [mutate],
-  );
+  const handleDelete = useCallback((id: number, password: string) => mutate({ system_id: id, password }), [mutate]);
   const handleDownload = useCallback(
     (systemId: number, systemName: string) => () => downloadSystemBackup(systemId, systemName),
     [downloadSystemBackup],
@@ -112,7 +109,7 @@ const Page: React.FC = () => {
 
   const handleSaveButtonCLick = useCallback(() => {
     if (systemFile) {
-      addMutate.mutate(systemFile);
+      addMutate(systemFile);
     }
   }, [addMutate, systemFile]);
 
@@ -120,9 +117,9 @@ const Page: React.FC = () => {
     ({ add, system_id }: { add: boolean; system_id: number }) => {
       if (user) {
         if (add) {
-          starAddMutation.mutate({ system_id: system_id, user_id: user.id });
+          starAddMutation({ system_id: system_id, user_id: user.id });
         } else {
-          starRemoveMutation.mutate(likeMap.get(system_id) ?? -1);
+          starRemoveMutation(likeMap.get(system_id) ?? -1);
         }
       }
     },
@@ -133,7 +130,7 @@ const Page: React.FC = () => {
     <div className={cnUserProfile()}>
       <label className={cnUserProfile('importSystem', { isUpload: !!systemFile })}>
         <input type="file" accept=".ipopes" className={cnUserProfile('input')} onChange={handleFileUpload} />
-        {!systemFile && !addMutate.isPending ? (
+        {!systemFile && !addMutateIsPending ? (
           <>
             <AddIcon width={30} height={30} />
             <Text>Загрузить систему</Text>
@@ -142,7 +139,7 @@ const Page: React.FC = () => {
           <>
             <FileCheck width={30} height={30} />
             <Text>{systemFile?.name}</Text>
-            <Button onClick={handleSaveButtonCLick} loading={addMutate.isPending}>
+            <Button onClick={handleSaveButtonCLick} loading={addMutateIsPending}>
               Сохранить
             </Button>
           </>

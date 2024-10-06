@@ -1,5 +1,7 @@
 .text {
   display: -webkit-box;
+  height: -webkit-max-content;
+  height: -moz-max-content;
   height: max-content;
   overflow: hidden;
   color: currentColor;

@@ -33,6 +33,10 @@
       border: 0;
     }
 
+    &::-webkit-backdrop {
+      background-color: transparent;
+    }
+
     &::backdrop {
       background-color: transparent;
     }

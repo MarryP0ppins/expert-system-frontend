@@ -13,9 +13,10 @@
   @include shadow;
 
   &-wrapper {
-
     display: grid;
+    grid-template-columns: -webkit-max-content;
     grid-template-columns: max-content;
+    grid-template-rows: -webkit-max-content;
     grid-template-rows: max-content;
     justify-content: center;
     align-items: center;

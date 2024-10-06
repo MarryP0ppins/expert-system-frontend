@@ -2,6 +2,7 @@
   border: 5px solid $loader-bg;
   border-radius: 50%;
   transform: rotate(122deg);
+  -webkit-animation: rotate 1s linear infinite;
   animation: rotate 1s linear infinite;
 
   &_size {
@@ -23,6 +24,15 @@
       margin: 10px;
       border-width: 5px;
     }
+  }
+}
+
+@-webkit-keyframes rotate {
+  from {
+    transform: rotate(0turn);
+  }
+  to {
+    transform: rotate(1turn);
   }
 }
 

@@ -31,6 +31,8 @@
 
   img {
     width: 100%;
+    max-width: -webkit-max-content;
+    max-width: -moz-max-content;
     max-width: max-content;
     height: auto;
   }

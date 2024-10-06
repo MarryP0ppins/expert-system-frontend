@@ -13,6 +13,18 @@
     margin-right: $space-xs;
     margin-left: $space-xxs;
   }
+  &::-webkit-input-placeholder {
+    color: $input-placeholder;
+  }
+  &::-moz-placeholder {
+    color: $input-placeholder;
+  }
+  &:-ms-input-placeholder {
+    color: $input-placeholder;
+  }
+  &::-ms-input-placeholder {
+    color: $input-placeholder;
+  }
   &::placeholder {
     color: $input-placeholder;
   }

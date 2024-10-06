@@ -43,6 +43,10 @@
       border: 0;
     }
 
+    &::-webkit-backdrop {
+      background-color: rgb(255 255 255 / 0.5);
+    }
+
     &::backdrop {
       background-color: rgb(255 255 255 / 0.5);
     }
@@ -54,6 +58,7 @@
 
   &-rawWrapper {
     display: grid;
+    grid-template-columns: 1fr -webkit-min-content;
     grid-template-columns: 1fr min-content;
     gap: $space-m;
   }

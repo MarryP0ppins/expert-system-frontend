@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { use } from 'react';
 import { notFound } from 'next/navigation';
 
 // import { TQueryKey } from '@/api';
@@ -18,11 +18,16 @@ const cnMainLayout = classname(classes, 'system-editor-layout');
 
 type SystemEditorPageLayoutProps = {
   children: React.ReactNode;
-  params: { system_id: number };
+  params: Promise<{ system_id: string }>;
 };
 
 const Layout: React.FC<SystemEditorPageLayoutProps> = ({ children, params }) => {
-  const system_id = systemIdValidation.safeParse(params).data?.system_id;
+  const systemIdParam = use(params).system_id;
+  const system_id = systemIdValidation.safeParse(systemIdParam).data;
+
+  if (!system_id) {
+    notFound();
+  }
 
   //const queryClient = getQueryClient();
   //const queryClient = new QueryClient();

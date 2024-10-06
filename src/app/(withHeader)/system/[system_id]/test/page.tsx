@@ -1,7 +1,8 @@
 'use client';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { use, useCallback, useEffect, useMemo, useState } from 'react';
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { useShallow } from 'zustand/react/shallow';
 
 import { TQueryKey } from '@/api';
@@ -25,17 +26,24 @@ import classes from './page.module.scss';
 const cnSystemCreatePage = classname(classes, 'systemTestPage');
 
 type SystemTestPageProps = {
-  params: { system_id: number };
+  params: Promise<{ system_id: string }>;
 };
 
 const Page: React.FC<SystemTestPageProps> = ({ params }) => {
+  const systemIdParam = use(params).system_id;
+  const system_id = systemIdValidation.safeParse(systemIdParam).data;
+
+  if (!system_id) {
+    notFound();
+  }
+
   const { user, isLogin } = useUserStore(
     useShallow((store) => ({
       user: store.user,
       isLogin: store.isLogin,
     })),
   );
-  const system_id = useMemo(() => systemIdValidation.safeParse(params).data?.system_id ?? -1, [params]);
+
   const [currentQuestionNumber, setCurrentQuestionNumber] = useState(0);
   const [currentOption, setCurrentOption] = useState<TAnswer | undefined>();
   const [rules, setRules] = useState<TRule[]>([]);

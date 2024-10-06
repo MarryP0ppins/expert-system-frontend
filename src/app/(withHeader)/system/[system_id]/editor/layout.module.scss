@@ -2,6 +2,7 @@
   position: relative;
   display: grid;
   grid-template-columns: 100%;
+  grid-template-rows: -webkit-max-content 1fr;
   grid-template-rows: max-content 1fr;
   justify-items: center;
   align-items: center;

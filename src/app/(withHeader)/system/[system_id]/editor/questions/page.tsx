@@ -1,9 +1,10 @@
 'use client';
-import React, { useCallback, useMemo } from 'react';
+import React, { use, useCallback } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
+import { notFound } from 'next/navigation';
 
 import { TQueryKey } from '@/api';
 import { getQuestionsWithAnswers } from '@/api/services/questions';
@@ -24,19 +25,25 @@ import {
   normilizeResponseDataQuestionWithAnswer,
 } from '@/utils/questionWithAnswerPage';
 import { formQuestionWithAnswerValidation } from '@/validation/questions';
+import { systemIdValidation } from '@/validation/searchParams';
 
 import classes from './page.module.scss';
 
 const cnQuestions = classname(classes, 'editor-questions');
 
 type PageProps = {
-  params: { system_id: number };
+  params: Promise<{ system_id: string }>;
 };
 
 const Page: React.FC<PageProps> = ({ params }) => {
-  const queryClient = getQueryClient();
+  const systemIdParam = use(params).system_id;
+  const system_id = systemIdValidation.safeParse(systemIdParam).data;
 
-  const system_id = useMemo(() => Number(params.system_id) ?? -1, [params]);
+  if (!system_id) {
+    notFound();
+  }
+
+  const queryClient = getQueryClient();
 
   const { data, isLoading } = useSuspenseQuery({
     queryKey: [QUESTIONS.GET, { system: system_id }],

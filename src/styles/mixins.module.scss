@@ -51,6 +51,8 @@
   gap: $space-xl;
   width: 100%;
   max-width: 1440px;
+  height: -webkit-max-content;
+  height: -moz-max-content;
   height: max-content;
   min-height: calc(100dvh - 64px);
   padding: 40px 100px 20px;
@@ -80,7 +82,6 @@
 
 @mixin notselect {
   -webkit-user-select: none;
-  -khtml-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;

@@ -61,7 +61,7 @@ const SystemsContainer: React.FC = () => {
     [setSystemsSearchParams, data, validateParams],
   );
 
-  const starAddMutation = useMutation({
+  const { mutate: starAddMutation } = useMutation({
     mutationFn: createLike,
     onSuccess: (newLike) => {
       updateLikes({ add: true, system_id: newLike.system_id, like_id: newLike.id });
@@ -95,7 +95,7 @@ const SystemsContainer: React.FC = () => {
     },
   });
 
-  const starRemoveMutation = useMutation({
+  const { mutate: starRemoveMutation } = useMutation({
     mutationFn: ({ like_id, system_id }: { like_id: number; system_id: number }) => {
       deleteLike(like_id);
       return Promise.resolve(system_id);
@@ -136,9 +136,9 @@ const SystemsContainer: React.FC = () => {
     ({ add, system_id }: { add: boolean; system_id: number }) => {
       if (user) {
         if (add) {
-          starAddMutation.mutate({ system_id: system_id, user_id: user.id });
+          starAddMutation({ system_id: system_id, user_id: user.id });
         } else {
-          starRemoveMutation.mutate({ system_id: system_id, like_id: likeMap.get(system_id) ?? -1 });
+          starRemoveMutation({ system_id: system_id, like_id: likeMap.get(system_id) ?? -1 });
         }
       }
     },
