@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react';
 import moment from 'moment';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import localFont from 'next/font/local';
 
 import { Providers } from '@/providers';
 import { classname } from '@/utils/classname';
@@ -11,7 +11,26 @@ import classes from './layout.module.scss';
 
 const cnMainLayout = classname(classes, 'mainLayout');
 
-const inter = Inter({ subsets: ['cyrillic'] });
+const inter = localFont({
+  src: [
+    {
+      path: '../fonts/Inter_18pt-Bold.ttf',
+      weight: '700',
+      style: 'normal',
+    },
+    {
+      path: '../fonts/Inter_18pt-Medium.ttf',
+      weight: '500',
+      style: 'normal',
+    },
+    {
+      path: '../fonts/Inter_18pt-Regular.ttf',
+      weight: '400',
+      style: 'normal',
+      
+    },
+  ],
+});
 
 export const metadata: Metadata = {
   title: 'ИПО ПЭС',

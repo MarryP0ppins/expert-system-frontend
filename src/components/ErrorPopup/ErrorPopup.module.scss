@@ -1,6 +1,6 @@
-.errorPopup {
-  anchor-name: --anchor-el;
-  anchor-scope: --anchor-el;
+.errorPopup {  
+  // anchor-name: var(--anchor-el);
+  // anchor-scope: --anchor-el;
 
   &-text {
     margin: 0;
@@ -23,7 +23,7 @@
     font: inherit;
     background: none;
     cursor: pointer;
-    //anchor-name: --anchor-el;
+    anchor-name: var(--anchor-el);
 
     &_visible {
       display: none;
@@ -31,18 +31,19 @@
   }
 
   &-popover {
-    right: anchor(right);
-    bottom: anchor(top);
+    right: anchor(--anchor-el right);
+    bottom: anchor(--anchor-el top);
     margin: 0;
     border: 1px solid $border-color;
     border-radius: $border-radius;
     padding: $space-xxs $space-m;
     background-color: #fff;
+    position-anchor: var(--anchor-el);
     //position: absolute;
     // top: 1rem;
     // left: 0;
     // right: 0
-    position-anchor: --anchor-el;
+   
     inset-area: top span-left;
   }
 }

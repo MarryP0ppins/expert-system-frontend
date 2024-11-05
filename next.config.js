@@ -1,8 +1,13 @@
+// @ts-check
+
 /** @type {import('next').NextConfig} */
-module.exports = {
+const nextConfig = {
   experimental: {
     reactCompiler: true,
   },
+  // turbo: {
+  //   useSwcCss: true,
+  // },
   sassOptions: {
     additionalData: `
               @import "src/styles/variables.module.scss";
@@ -20,3 +25,5 @@ module.exports = {
     ],
   },
 };
+
+module.exports = nextConfig;

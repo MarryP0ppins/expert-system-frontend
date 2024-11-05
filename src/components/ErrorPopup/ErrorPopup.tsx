@@ -21,11 +21,18 @@ const cnPopup = classname(classes, 'errorPopup');
 
 // const ErrorPopup: React.FC<ErrorPopupProps> = ({ error }) => {
 //   const id = useId();
-
+//   const ref = useRef<HTMLButtonElement>(null);
+//   useEffect(() => {
+//     if (ref.current) {
+//       ref.current.style.setProperty('--anchor-el', `--anchor-trigger-${id}`);
+//     }
+//   }, [id]);
+//   //style={{ '--anchor-el': `anchor-trigger-${id}` }}
 //   return (
 //     <div className={cnPopup()}>
 //       <button
-//         id={`anchor-trigger-${id}`}
+//         ref={ref}
+//         // id={`anchor-trigger-${id}`}
 //         popoverTarget={`anchor-popover-${id}`}
 //         className={cnPopup('trigger', { visible: !error })}
 //         type="button"
@@ -65,4 +72,4 @@ const ErrorPopup: React.FC<ErrorPopupProps> = ({ error, position = 'top right', 
   );
 };
 
-export default ErrorPopup;
+ export default ErrorPopup;
