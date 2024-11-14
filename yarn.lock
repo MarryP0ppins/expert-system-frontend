@@ -1224,12 +1224,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"babel-plugin-react-compiler@npm:19.0.0-beta-63b359f-20241101":
-  version: 19.0.0-beta-63b359f-20241101
-  resolution: "babel-plugin-react-compiler@npm:19.0.0-beta-63b359f-20241101"
+"babel-plugin-react-compiler@npm:^19.0.0-beta-a7bf2bd-20241110":
+  version: 19.0.0-beta-a7bf2bd-20241110
+  resolution: "babel-plugin-react-compiler@npm:19.0.0-beta-a7bf2bd-20241110"
   dependencies:
     "@babel/types": "npm:^7.19.0"
-  checksum: 10c0/c65ae155cc4330b9cb774b7263f60382bd5428bf3d938b90bdbb4c35c69c66333f289c98307c910baab19a2aaf2c3b03185f549299e3f68660689fce9a50a9c4
+  checksum: 10c0/595a8bc200e31fc7066fdceb776e49edf592f47039d382716da2c16e8e0e1b47cc9eeefcb2c1ea1c1150582d48992027402db6dd4dee792915fff1cffd37e50b
   languageName: node
   linkType: hard
 
@@ -2073,7 +2073,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^7"
     "@typescript-eslint/parser": "npm:^7"
     axios: "npm:^1"
-    babel-plugin-react-compiler: "npm:19.0.0-beta-63b359f-20241101"
+    babel-plugin-react-compiler: "npm:^19.0.0-beta-a7bf2bd-20241110"
     eslint: "npm:^8"
     eslint-config-next: "npm:^15"
     eslint-plugin-eqeqeq-fix: "npm:^1"
@@ -2084,9 +2084,9 @@ __metadata:
     moment: "npm:^2"
     next: "npm:^15"
     prettier: "npm:^3"
-    react: "npm:19.0.0-rc-4d577fd2-20241104"
+    react: "npm:19.0.0-rc-7ac8e612-20241113"
     react-content-loader: "npm:^7"
-    react-dom: "npm:19.0.0-rc-4d577fd2-20241104"
+    react-dom: "npm:19.0.0-rc-7ac8e612-20241113"
     react-hook-form: "npm:^7"
     reactjs-popup: "npm:^2"
     sass: "npm:^1"
@@ -3650,14 +3650,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:19.0.0-rc-4d577fd2-20241104":
-  version: 19.0.0-rc-4d577fd2-20241104
-  resolution: "react-dom@npm:19.0.0-rc-4d577fd2-20241104"
+"react-dom@npm:19.0.0-rc-7ac8e612-20241113":
+  version: 19.0.0-rc-7ac8e612-20241113
+  resolution: "react-dom@npm:19.0.0-rc-7ac8e612-20241113"
   dependencies:
-    scheduler: "npm:0.25.0-rc-4d577fd2-20241104"
+    scheduler: "npm:0.25.0-rc-7ac8e612-20241113"
   peerDependencies:
-    react: 19.0.0-rc-4d577fd2-20241104
-  checksum: 10c0/29bf0ae80d529b02d7158ae9fbbb86d80de6df8fde3db27504b249f4f64a926d7ec951a02695d2ecc485fd82fc6944085f6391464fa6f4056aa6f267a2581877
+    react: 19.0.0-rc-7ac8e612-20241113
+  checksum: 10c0/f6fc249b79c875b36c58a8d1e28cd0a79a759de6edb1a466a732ebb25d6d376e840626f383e479c74c731fc02f5f289044304731f652abb91a595f1f806a11ce
   languageName: node
   linkType: hard
 
@@ -3677,10 +3677,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:19.0.0-rc-4d577fd2-20241104":
-  version: 19.0.0-rc-4d577fd2-20241104
-  resolution: "react@npm:19.0.0-rc-4d577fd2-20241104"
-  checksum: 10c0/47dcd66031c7e0549fdf4ad262bf4d1cc6f92914712c456d61db4e5165d2ec2468dc36ba5617bf8ab3044e635e681332817ffa223defb885259ce0b96d0cc686
+"react@npm:19.0.0-rc-7ac8e612-20241113":
+  version: 19.0.0-rc-7ac8e612-20241113
+  resolution: "react@npm:19.0.0-rc-7ac8e612-20241113"
+  checksum: 10c0/ec2c01b8697a248b5245368844938c4ebca86683c003357d6c0125f5adc9c1d98ef5f21f14838d58c39ee1efdbb7806167154ea846b13f05db67ef26b166f33c
   languageName: node
   linkType: hard
 
@@ -3875,10 +3875,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"scheduler@npm:0.25.0-rc-4d577fd2-20241104":
-  version: 0.25.0-rc-4d577fd2-20241104
-  resolution: "scheduler@npm:0.25.0-rc-4d577fd2-20241104"
-  checksum: 10c0/f9c21fab3209918fb5756298b9ab04787864d6ecaefa73443e465152379a93242feb56c0db0cb0f4f66728e0b6c225a112cffbccc685fe9460e9eddfa42c8d65
+"scheduler@npm:0.25.0-rc-7ac8e612-20241113":
+  version: 0.25.0-rc-7ac8e612-20241113
+  resolution: "scheduler@npm:0.25.0-rc-7ac8e612-20241113"
+  checksum: 10c0/a5cf25b1acf35db6facc1f85398161478d65636ec857654acb9189eb1b5de5ec826d7e5616a07e311c526538e71c33daf16ec8a84cd0a62e1a1f40321da9f890
   languageName: node
   linkType: hard
 
