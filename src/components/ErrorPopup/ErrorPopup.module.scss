@@ -31,7 +31,7 @@
   }
 
   &-popover {
-    right: anchor(--anchor-el right);
+    right: anchor(--anchor-el left);
     bottom: anchor(--anchor-el top);
     margin: 0;
     border: 1px solid $border-color;

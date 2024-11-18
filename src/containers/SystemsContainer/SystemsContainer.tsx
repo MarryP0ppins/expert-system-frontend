@@ -149,10 +149,11 @@ const SystemsContainer: React.FC = () => {
     <div className={cnSystemsContainer()}>
       {!!data?.systems.length &&
         isSuccess &&
-        data.systems.map((system) => (
+        data.systems.map((system, index) => (
           <Card
             id={system.id}
             key={system.id}
+            priority={index === 0}
             image={system.image_uri}
             title={system.name}
             subtitle={system.about}

@@ -1,3 +1,5 @@
+@use "@/styles/variables.module.scss" as *;
+
 @mixin title {
   font-weight: 700;
   font-size: 44px;

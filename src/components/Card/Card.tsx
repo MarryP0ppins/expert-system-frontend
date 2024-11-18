@@ -30,6 +30,7 @@ export type CardProps = {
   title: ReactNode;
   subtitle: ReactNode;
   stars: number;
+  priority?: boolean;
   canLike: boolean;
   likeMap: Map<number, number>;
   userPageOption?: boolean;
@@ -50,6 +51,7 @@ const Card: React.FC<CardProps> = ({
   subtitle,
   canLike,
   likeMap,
+  priority = false,
   userPageOption = false,
   onClick,
   onDeleteClick,
@@ -97,6 +99,7 @@ const Card: React.FC<CardProps> = ({
     <div className={cnCard() + ` ${className}`} onClick={onClick}>
       <Image
         alt="logo"
+        priority={priority}
         src={isError || !image ? defaultImage : imageUrl(image)}
         className={cnCard('image')}
         width={280}

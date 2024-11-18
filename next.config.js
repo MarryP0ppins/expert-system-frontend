@@ -5,13 +5,10 @@ const nextConfig = {
   experimental: {
     reactCompiler: true,
   },
-  // turbo: {
-  //   useSwcCss: true,
-  // },
   sassOptions: {
     additionalData: `
-              @import "src/styles/variables.module.scss";
-              @import "src/styles/mixins.module.scss";
+              @use "@/styles/variables.module.scss" as *;
+              @use "@/styles/mixins.module.scss" as *;
             `,
   },
   images: {
